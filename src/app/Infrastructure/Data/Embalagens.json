@@ -1,5 +1,11 @@
 [
     {
+        "Id": 0,
+        "xEmbalagem": "Unidade",
+        "cEmbalagem": "UN",
+        "Peso": 0
+    },    
+    {
       "Id": 1,
       "xEmbalagem": "6X25G",
       "cEmbalagem": "CX",

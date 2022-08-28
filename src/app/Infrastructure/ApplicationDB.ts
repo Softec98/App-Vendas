@@ -13,6 +13,7 @@ import cfop from './Data/CFOP.json';
 import embalagem from './Data/Embalagens.json';
 import prodFamilia from './Data/ProdFamilia.json'
 import prodGrupo from './Data/ProdGrupo.json'
+import ncm from './Data/NCM.json'
 
 export class ApplicationDB extends Dexie {
   CFOP!: Table<CFOPDB, number>;
@@ -34,7 +35,7 @@ export class ApplicationDB extends Dexie {
         NCM: '++Id',
         Pedidos: '++Id',
         PedidosItens: '++Id',
-        ProdutoFamila: '++Id',
+        ProdutoFamilia: '++Id',
         ProdutoGrupo: '++Id',
         Produtos: '++Id'
     });
@@ -45,7 +46,7 @@ export class ApplicationDB extends Dexie {
     this.NCM.mapToClass(NCMDB);
     this.Pedidos.mapToClass(PedidosDB);
     this.PedidosItens.mapToClass(PedidosItensDB);
-    //this.ProdutoFamilia.mapToClass(ProdutoFamiliaDB);
+    this.ProdutoFamilia.mapToClass(ProdutoFamiliaDB);
     this.ProdutoGrupo.mapToClass(ProdutoGrupoDB);
     this.Produtos.mapToClass(ProdutosDB);
 
@@ -57,62 +58,14 @@ export class ApplicationDB extends Dexie {
     //   title: 'To Do Today',
     // });
 
-    db.CFOP.bulkAdd(this.ObterLista<CFOPDB>(cfop));
-    db.Embalagens.bulkAdd(this.ObterLista<EmbalagensDB>(embalagem));
-    db.ProdutoGrupo.bulkAdd(this.ObterLista<ProdutoGrupoDB>(prodGrupo));
-    //db.ProdutoFamilia.bulkAdd(this.ObterLista<ProdutoFamiliaDB>(prodFamilia));
-
-    // await db.NCM.bulkAdd([
-    //     {
-    //         Id: 1,
-    //         NCM: '28363000',
-    //         EXTIPI: '',
-    //         pIPI: 0,
-    //         vIPI: 0,
-    //         cIPI: ''
-    //     },
-    //     {
-    //         Id: 2,
-    //         NCM: '29054500',
-    //         EXTIPI: '',
-    //         pIPI: 0,
-    //         vIPI: 0,
-    //         cIPI: ''
-    //     },
-    //     {
-    //         Id: 3,
-    //         NCM: '32021000',
-    //         EXTIPI: '',
-    //         pIPI: 0,
-    //         vIPI: 0,
-    //         cIPI: ''
-    //     },
-    //     {
-    //         Id: 4,
-    //         NCM: '32049000',
-    //         EXTIPI: '',
-    //         pIPI: 0,
-    //         vIPI: 0,
-    //         cIPI: ''
-    //     },
-    //     {
-    //         Id: 5,
-    //         NCM: '32042090',
-    //         EXTIPI: '',
-    //         pIPI: 0,
-    //         vIPI: 0,
-    //         cIPI: ''
-    //     },        
-    //     {
-    //         Id: 6,
-    //         NCM: '32061910',
-    //         EXTIPI: '',
-    //         pIPI: 0,
-    //         vIPI: 0,
-    //         cIPI: ''
-    //     }
-    // ]);
-
+    await Promise.all([
+      db.CFOP.bulkAdd(this.ObterLista<CFOPDB>(cfop)),
+      db.Embalagens.bulkAdd(this.ObterLista<EmbalagensDB>(embalagem)),
+      db.ProdutoFamilia.bulkAdd(this.ObterLista<ProdutoFamiliaDB>(prodFamilia)),
+      db.ProdutoGrupo.bulkAdd(this.ObterLista<ProdutoGrupoDB>(prodGrupo)),
+      db.NCM.bulkAdd(this.ObterLista<NCMDB>(ncm))
+   ]);
+   
     // await db.Produtos.bulkAdd([
     //     {
     //         cProd:'METÁLICA DOURADO',
