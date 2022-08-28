@@ -1,0 +1,68 @@
+[
+    {
+      "Id": 1,
+      "xEmbalagem": "6X25G",
+      "cEmbalagem": "CX",
+      "Peso": 0
+    },
+    {
+        "Id": 2,
+        "xEmbalagem": "6X60G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },      
+    {
+        "Id": 3,
+        "xEmbalagem": "12X3G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },
+    {
+        "Id": 4,
+        "xEmbalagem": "12X5G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },
+    {
+        "Id": 5,
+        "xEmbalagem": "12X15G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },  
+    {
+        "Id": 6,
+        "xEmbalagem": "12X40G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },
+    {
+        "Id": 7,
+        "xEmbalagem": "12X50G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },
+    {
+        "Id": 8,
+        "xEmbalagem": "12X60G",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },            
+    {
+        "Id": 9,
+        "xEmbalagem": "12X10ML",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },         
+    {
+        "Id": 10,
+        "xEmbalagem": "12X270ML",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    },
+    {
+        "Id": 11,
+        "xEmbalagem": "30X50ML",
+        "cEmbalagem": "CX",
+        "Peso": 0
+    }
+  ]

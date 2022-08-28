@@ -30,7 +30,7 @@ export class PedidosItensDB  {
     public numPedCli!: string;
     public numPedCliItem!: number;
 
-    public constructor(init?: PedidosItensDB ) {
+    public constructor(init?: Partial<PedidosItensDB> ) {
         Object.assign(this, init);
     }
 }

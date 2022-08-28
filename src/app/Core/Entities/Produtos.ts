@@ -16,7 +16,7 @@ export class ProdutosDB  {
     public indLancamento!: boolean;
     public indInativo!: boolean;
 
-    public constructor(init?: ProdutosDB ) {
+    public constructor(init?: Partial<ProdutosDB> ) {
         Object.assign(this, init);
     }
 }

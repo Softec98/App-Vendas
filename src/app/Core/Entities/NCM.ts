@@ -7,7 +7,7 @@ export class NCMDB  {
     public vIPI!: number;
     public cIPI!: string;
 
-    public constructor(init?: NCMDB ) {
+    public constructor(init?: Partial<NCMDB> ) {
         Object.assign(this, init);
     }
 }

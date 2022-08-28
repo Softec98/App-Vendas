@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-
+import { DataService } from 'src/app/Infrastructure/Service/data.service';
 
 @Component({
   selector: 'app-home',
@@ -21,9 +21,11 @@ export class HomeComponent implements OnInit {
   constructor(
     private media: MediaObserver,
     private changeDetectorRef: ChangeDetectorRef,
+    private dataService: DataService
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    const cfop = await this.dataService.obterCFOP();
   }
 
 }

@@ -1,11 +1,11 @@
-export class EmbalagensDB  {
+export class EmbalagensDB {
 
     public Id?: number;
-    public cEmbalagem!: string;
     public xEmbalagem!: string;
+    public cEmbalagem!: string;
     public Peso!: number;
 
-    public constructor(init?: EmbalagensDB ) {
+    public constructor(init?: Partial<EmbalagensDB> ) {
         Object.assign(this, init);
     }
 }

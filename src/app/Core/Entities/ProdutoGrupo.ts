@@ -5,7 +5,7 @@ export class ProdutoGrupoDB  {
     public Id_NCM!: number;
     public ValidadeEmMeses!: number;
 
-    public constructor(init?: ProdutoGrupoDB ) {
+    public constructor(init?: Partial<ProdutoGrupoDB> ) {
         Object.assign(this, init);
     }
 }

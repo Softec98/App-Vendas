@@ -32,7 +32,7 @@ export class PedidosDB extends BaseEntity {
     public TrackNumber!: string;
     public datEnvio!: Date;
 
-    public constructor(init?: PedidosDB ) {
+    public constructor(init?: Partial<PedidosDB> ) {
         super(init as PedidosDB)
         Object.assign(this, init);
     }
