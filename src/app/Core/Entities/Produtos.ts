@@ -18,5 +18,7 @@ export class ProdutosDB  {
 
     public constructor(init?: Partial<ProdutosDB> ) {
         Object.assign(this, init);
+
+        
     }
 }

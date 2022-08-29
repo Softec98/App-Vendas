@@ -1,0 +1,134 @@
+[
+    {
+        "Id": 1,
+        "Frete": 1,
+        "Id_Produto_Grupo": 1,
+        "vPreco": 88.2
+    },
+    {
+        "Id": 2,
+        "Frete": 1,
+        "Id_Produto": 15060001,
+        "vPreco": 84
+    },
+    {
+        "Id": 3,
+        "Frete": 1,
+        "Id_Produto": 15060002,
+        "vPreco": 87
+    },
+    {
+        "Id": 3,
+        "Frete": 1,
+        "Id_Produto": 15050001,
+        "vPreco": 37.2
+    },
+    {
+        "Id": 4,
+        "Frete": 1,
+        "Id_Produto": 15050003,
+        "vPreco": 36.6
+    },
+    {
+        "Id": 5,
+        "Frete": 1,
+        "Id_Produto_Familia": 7,
+        "vPreco": 17.8
+    },
+    {
+        "Id": 6,
+        "Frete": 1,
+        "Id_Produto_Familia": 8,
+        "vPreco": 21
+    },
+    {
+        "Id": 7,
+        "Frete": 1,
+        "Id_Produto_Familia": 9,
+        "vPreco": 18.06
+    },
+    {
+        "Id": 8,
+        "Frete": 1,
+        "Id_Produto_Familia": 10,
+        "vPreco": 30.6
+    },
+    {
+        "Id": 9,
+        "Frete": 1,
+        "Id_Produto": 16010303,
+        "vPreco": 31.8
+    },
+    {
+        "Id": 10,
+        "Frete": 1,
+        "Id_Produto": 16010308,
+        "vPreco": 34.8
+    },
+    {
+        "Id": 11,
+        "Frete": 1,
+        "Id_Produto": 16010310,
+        "vPreco": 34.8
+    },
+    {
+        "Id": 12,
+        "Frete": 1,
+        "Id_Produto": 16010311,
+        "vPreco": 34.8
+    },
+    {
+        "Id": 13,
+        "Frete": 1,
+        "Id_Produto": 16010320,
+        "vPreco": 34.8
+    },
+    {
+        "Id": 14,
+        "Frete": 1,
+        "Id_Produto": 16010322,
+        "vPreco": 31.8
+    },
+    {
+        "Id": 15,
+        "Frete": 1,
+        "Id_Produto_Familia": 11,
+        "vPreco": 25.8
+    },
+    {
+        "Id": 16,
+        "Frete": 1,
+        "Id_Produto_Grupo": 6,
+        "vPreco": 88.2
+    },
+    {
+        "Id": 17,
+        "Frete": 1,
+        "Id_Produto_Familia": 14,
+        "vPreco": 88.2
+    },
+    {
+        "Id": 18,
+        "Frete": 1,
+        "Id_Produto_Familia": 15,
+        "vPreco": 18.06
+    },
+    {
+        "Id": 19,
+        "Frete": 1,
+        "Id_Produto": 15050001,
+        "vPreco": 42
+    },
+    {
+        "Id": 20,
+        "Frete": 1,
+        "Id_Produto": 15050003,
+        "vPreco": 32.4
+    },
+    {
+        "Id": 21,
+        "Frete": 1,
+        "Id_Produto_Grupo": 7,
+        "vPreco": 34.62
+    }    
+]
