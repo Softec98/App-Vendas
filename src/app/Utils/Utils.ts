@@ -1,4 +1,5 @@
 import { AbstractControl, Validators } from "@angular/forms";
+import { DynamicClass } from "../Infrastructure/ApplicationDB";
 
 export class Utils {
 
@@ -85,4 +86,16 @@ export class Utils {
                 return data;
             });
     }
-}
+
+    public static  ObterLista<T>(objeto: any, nome: string = ""): any {
+        return Object.keys(objeto).map((i: any) => {
+            if (nome !== "")
+                return new DynamicClass(nome, objeto[i]);
+            else
+                return this.Tabela<T>(objeto[i]) }) 
+      }
+    
+      static Tabela <T>(value: T) : T {
+        return value;
+      }
+    }

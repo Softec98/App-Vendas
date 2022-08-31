@@ -1,3 +1,4 @@
+import { EFrete } from "../Enums/EFrete.enum";
 import { BaseEntity } from "./BaseEntity";
 
 export class PedidosDB extends BaseEntity {
@@ -11,7 +12,7 @@ export class PedidosDB extends BaseEntity {
     public Id_Status!: number;
     public Id_Pagto_Tipo!: number;
     public Id_Pagto_Codigo!: number;
-    public Id_Frete!: number;
+    public Frete!: EFrete;
     public valTotal!: number;
     public valDesconto!: number;
     public valFrete!: number;

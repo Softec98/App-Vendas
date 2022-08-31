@@ -1,0 +1,44 @@
+[
+    { 
+        "cProd": "15010001",
+        "xProd": "METÁLICA DOURADO",
+        "Id_Embalagem": 4,
+        "Id_Produto_Familia": 1,
+        "Id_Produto_Grupo": 1
+    },
+    { 
+        "cProd": "15010002",
+        "xProd": "METÁLICA DOURADO ANTIGO",
+        "Id_Embalagem": 3,
+        "Id_Produto_Familia": 1,
+        "Id_Produto_Grupo": 1
+    },
+    { 
+        "cProd": "15010006",
+        "xProd": "METÁLICA DOURADO EGÍPCIO",
+        "Id_Embalagem": 4,
+        "Id_Produto_Familia": 1,
+        "Id_Produto_Grupo": 1
+    },
+    { 
+        "cProd": "15010005",
+        "xProd": "METÁLICA DOURADO ROSÊ",
+        "Id_Embalagem": 4,
+        "Id_Produto_Familia": 1,
+        "Id_Produto_Grupo": 1
+    },
+    { 
+        "cProd": "15010003",
+        "xProd": "METÁLICA PRATEADO",
+        "Id_Embalagem": 3,
+        "Id_Produto_Familia": 1,
+        "Id_Produto_Grupo": 1
+    },
+    { 
+        "cProd": "15010004",
+        "xProd": "METÁLICA ACOBREADO",
+        "Id_Embalagem": 3,
+        "Id_Produto_Familia": 1,
+        "Id_Produto_Grupo": 1
+    }
+]
