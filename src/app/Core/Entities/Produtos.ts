@@ -53,9 +53,12 @@ export class ProdutosDB  {
         }
 
         if (typeof(this.vVenda) == 'undefined' && precos.length > 0) {
-            this.vVenda = precos.find(x => x.Id_Cond_Pagto == 1 && (
+            const preco = precos.find(x => x.Id_Cond_Pagto == 1 && (
             x.Id_Produto == this.Id || x.Id_Produto_Familia == this.Id_Produto_Familia ||
-            x.Id_Produto_Grupo == this.Id_Produto_Grupo))!.vPreco!
+            x.Id_Produto_Grupo == this.Id_Produto_Grupo));
+            if (preco !== null && typeof(preco) !== 'undefined' && typeof(preco?.vPreco) !== 'undefined') {
+                this.vVenda = preco.vPreco;
+            }
         }
     }
 }

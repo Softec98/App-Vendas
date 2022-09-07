@@ -46,5 +46,11 @@
         "xNome": "PÓ P/ DECORAÇÃO NEON",
         "Id_NCM": 5,
         "ValidadeEmMeses": 48
-      }      
+      },
+      {
+        "Id": 9,
+        "xNome": "CORANTES NEOCOLOR",
+        "Id_NCM": 4,
+        "ValidadeEmMeses": 24
+      }     
     ]
