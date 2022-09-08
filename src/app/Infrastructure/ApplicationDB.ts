@@ -19,6 +19,7 @@ import ncm from '../../assets/data/NCM.json'
 import condPagto from '../../assets/data/CondPagto.json'
 import prodPreco from '../../assets/data/ProdPreco.json'
 import produtos from '../../assets/data/Produtos.json'
+import { LogService } from './Service/log.service';
 
 export class ApplicationDB extends Dexie {
 
@@ -34,20 +35,22 @@ export class ApplicationDB extends Dexie {
   ProdutoPreco!: Table<ProdutoPrecoDB, number>;
   Produtos!: Table<ProdutosDB, number>;
 
+  produtosSemListaDePreco: ProdutosSemListaDePreco[] = [];
+
   constructor() {
     super('AppVendasDB');
     this.version(1).stores({
-        CFOP: '++Id',
-        CondPagto: '++Id',
-        Clientes: '++Id, xNome, CNPJ',
-        Embalagens: '++Id',
-        NCM: '++Id',
-        Pedidos: '++Id, Id_Cliente',
-        PedidosItens: '++Id, Id_Pedido, Id_Produto',
-        ProdutoFamilia: '++Id, Id_Embalagem',
-        ProdutoGrupo: '++Id, Id_NCM',
-        ProdutoPreco: '++Id, Id_Cond_Pagto, Id_Produto, Id_Produto_Familia, Id_Produto_Grupo',
-        Produtos: '++Id, cProd, xProd, Id_Produto_Familia, Id_Produto_Grupo, Id_Embalagem, Id_NCM'
+      CFOP: '++Id',
+      CondPagto: '++Id',
+      Clientes: '++Id, xNome, CNPJ',
+      Embalagens: '++Id',
+      NCM: '++Id',
+      Pedidos: '++Id, Id_Cliente',
+      PedidosItens: '++Id, Id_Pedido, Id_Produto',
+      ProdutoFamilia: '++Id, Id_Embalagem',
+      ProdutoGrupo: '++Id, Id_NCM',
+      ProdutoPreco: '++Id, Id_Cond_Pagto, Id_Produto, Id_Produto_Familia, Id_Produto_Grupo',
+      Produtos: '++Id, cProd, xProd, Id_Produto_Familia, Id_Produto_Grupo, Id_Embalagem, Id_NCM'
     });
 
     this.CFOP.mapToClass(CFOPDB);
@@ -79,8 +82,12 @@ export class ApplicationDB extends Dexie {
       db.ProdutoGrupo.bulkAdd(Utils.ObterLista<ProdutoGrupoDB>(prodGrupo)),
       db.ProdutoPreco.bulkAdd(Utils.ObterLista<ProdutoPrecoDB>(prodPreco)),
       db.Produtos.bulkAdd(Utils.ObterLista<ProdutosDB>(produtos, ProdutosDB.name))
-   ]);
+    ]);
 
+    if (LogService.listaDeProdutosSemListaDePreco.length > 0) {
+      const mensagem: string = LogService.listaDeProdutosSemListaDePreco.map(x => x.toString()).join("\n") ;
+      alert('Produtos sem lista de preço:\n\n' + mensagem);
+    }
   }
 }
 
@@ -92,10 +99,10 @@ export const precoJson = prodPreco;
 
 export class DynamicClass {
   constructor(className: string, opts: any) {
-      if (Store[className] === undefined || Store[className] === null) {
-          throw new Error(`Class type of \'${className}\' is not in the store`);
-      }
-      return new Store[className](opts);
+    if (Store[className] === undefined || Store[className] === null) {
+      throw new Error(`Class type of \'${className}\' is not in the store`);
+    }
+    return new Store[className](opts);
   }
 }
 
@@ -110,4 +117,18 @@ export const Store: any = {
   ProdutoFamiliaDB,
   ProdutoGrupoDB,
   ProdutoPrecoDB,
-  ProdutosDB }
+  ProdutosDB
+}
+
+export class ProdutosSemListaDePreco {
+  public cProd!: string;
+  public xProd!: string;
+
+  public constructor(init?: Partial<ProdutosSemListaDePreco> ) {
+    Object.assign(this, init);
+  }
+
+  toString(): string {
+    return `Código: ${this.cProd}, Nome: '${this.xProd}'.`;
+  }
+}
