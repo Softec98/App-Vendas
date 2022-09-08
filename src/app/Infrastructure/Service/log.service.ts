@@ -8,9 +8,9 @@ export class LogService {
 
   constructor() { }
 
-  static listaDeProdutosSemListaDePreco: ProdutosSemListaDePreco[] = [];
+  static produtosSemListaDePreco: ProdutosSemListaDePreco[] = [];
 
-   static constroiProdutosSemListaDePreco(produtoSemListaDePreco: ProdutosSemListaDePreco): void {
-    this.listaDeProdutosSemListaDePreco.push(produtoSemListaDePreco);
+   static AdicionarProdutosSemListaDePreco(produtoSemListaDePreco: ProdutosSemListaDePreco): void {
+    this.produtosSemListaDePreco.push(produtoSemListaDePreco);
   }
 }

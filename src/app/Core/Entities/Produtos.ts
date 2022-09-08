@@ -55,14 +55,12 @@ export class ProdutosDB {
 
         if (typeof (this.vVenda) == 'undefined' && precos.length > 0) {
             const preco = precos.find(x => x.Id_Cond_Pagto == 1 && (
-                x.Id_Produto == this.Id || x.Id_Produto_Familia == this.Id_Produto_Familia ||
+                x.cProd == this.cProd || x.Id_Produto_Familia == this.Id_Produto_Familia ||
                 x.Id_Produto_Grupo == this.Id_Produto_Grupo));
-            if (preco !== null && typeof (preco) !== 'undefined' && typeof (preco?.vPreco) !== 'undefined') {
+            if (preco !== null && typeof (preco) !== 'undefined' && typeof (preco?.vPreco) !== 'undefined')
                 this.vVenda = preco.vPreco;
-            } else {
-                //alert(`O produto ${this.cProd}-${this.xProd} está sem lista de preço!`);
-                LogService.constroiProdutosSemListaDePreco(new ProdutosSemListaDePreco(this));
-            }
+            else
+                LogService.AdicionarProdutosSemListaDePreco(new ProdutosSemListaDePreco(this));
         }
     }
 }

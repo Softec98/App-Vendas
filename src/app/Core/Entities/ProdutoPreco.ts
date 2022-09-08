@@ -2,7 +2,7 @@ export class ProdutoPrecoDB {
 
     public Id?: number;
     public Id_Cond_Pagto!: number; 
-    public Id_Produto!: number;
+    public cProd!: string;
     public Id_Produto_Familia!: number;
     public Id_Produto_Grupo!: number;
     public vPreco!: number;

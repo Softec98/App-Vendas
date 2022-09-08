@@ -19,7 +19,6 @@ import ncm from '../../assets/data/NCM.json'
 import condPagto from '../../assets/data/CondPagto.json'
 import prodPreco from '../../assets/data/ProdPreco.json'
 import produtos from '../../assets/data/Produtos.json'
-import { LogService } from './Service/log.service';
 
 export class ApplicationDB extends Dexie {
 
@@ -35,8 +34,6 @@ export class ApplicationDB extends Dexie {
   ProdutoPreco!: Table<ProdutoPrecoDB, number>;
   Produtos!: Table<ProdutosDB, number>;
 
-  produtosSemListaDePreco: ProdutosSemListaDePreco[] = [];
-
   constructor() {
     super('AppVendasDB');
     this.version(1).stores({
@@ -49,7 +46,7 @@ export class ApplicationDB extends Dexie {
       PedidosItens: '++Id, Id_Pedido, Id_Produto',
       ProdutoFamilia: '++Id, Id_Embalagem',
       ProdutoGrupo: '++Id, Id_NCM',
-      ProdutoPreco: '++Id, Id_Cond_Pagto, Id_Produto, Id_Produto_Familia, Id_Produto_Grupo',
+      ProdutoPreco: '++Id, Id_Cond_Pagto, cProd, Id_Produto_Familia, Id_Produto_Grupo',
       Produtos: '++Id, cProd, xProd, Id_Produto_Familia, Id_Produto_Grupo, Id_Embalagem, Id_NCM'
     });
 
@@ -66,13 +63,20 @@ export class ApplicationDB extends Dexie {
     this.Produtos.mapToClass(ProdutosDB);
 
     this.on('populate', () => this.populate());
+
+    this.on('ready', () => this.pronto())
+  }
+
+  async pronto() {
+    if (await db.Produtos.count() > 0) {
+        console.log("Banco de dados pronto para uso!");
+    }
   }
 
   async populate() {
     // const todoListId = await db.todoLists.add({
     //   title: 'To Do Today',
     // });
-
     await Promise.all([
       db.CFOP.bulkAdd(Utils.ObterLista<CFOPDB>(cfop)),
       db.CondPagto.bulkAdd(Utils.ObterLista<CondPagtoDB>(condPagto)),
@@ -83,11 +87,6 @@ export class ApplicationDB extends Dexie {
       db.ProdutoPreco.bulkAdd(Utils.ObterLista<ProdutoPrecoDB>(prodPreco)),
       db.Produtos.bulkAdd(Utils.ObterLista<ProdutosDB>(produtos, ProdutosDB.name))
     ]);
-
-    if (LogService.listaDeProdutosSemListaDePreco.length > 0) {
-      const mensagem: string = LogService.listaDeProdutosSemListaDePreco.map(x => x.toString()).join("\n") ;
-      alert('Produtos sem lista de preço:\n\n' + mensagem);
-    }
   }
 }
 
