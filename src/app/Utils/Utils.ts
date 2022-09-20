@@ -57,6 +57,12 @@ export class Utils {
         return campo?.match(/\d/g)?.join('')!;
     }
 
+    static cnpjMask = {
+        guide: true,
+        showMask: true,
+        mask: [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/]
+    };
+
     static cpfMask = {
         guide: true,
         showMask: true,
@@ -87,15 +93,16 @@ export class Utils {
             });
     }
 
-    public static  ObterLista<T>(objeto: any, nome: string = ""): any {
+    public static ObterLista<T>(objeto: any, nome: string = ""): any {
         return Object.keys(objeto).map((i: any) => {
             if (nome !== "")
                 return new DynamicClass(nome, objeto[i]);
             else
-                return this.Tabela<T>(objeto[i]) }) 
-      }
-    
-      static Tabela <T>(value: T) : T {
-        return value;
-      }
+                return this.Tabela<T>(objeto[i])
+        })
     }
+
+    static Tabela<T>(value: T): T {
+        return value;
+    }
+}

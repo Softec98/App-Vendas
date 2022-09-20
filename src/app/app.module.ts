@@ -19,9 +19,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TextMaskModule } from 'angular2-text-mask'; 
 
 import ptBr from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
+import { CpfPipe } from './Infrastructure/Pipes/cpf.pipe';
+import { CnpjPipe } from './Infrastructure/Pipes/cnpj.pipe';
+import { SelectOnFoscusDirective } from './Infrastructure/Directives/select-on-foscus.directive';
+import { MaskCepDirective } from './Infrastructure/Directives/mask-cep.directive';
+import { MaskDateDirective } from './Infrastructure/Directives/mask-date.directive';
 
 registerLocaleData(ptBr);
 
@@ -30,6 +36,11 @@ registerLocaleData(ptBr);
     AppComponent,
     HomeComponent,
     ListaPrecoComponent,
+    CpfPipe,
+    CnpjPipe,
+    SelectOnFoscusDirective,
+    MaskCepDirective,
+    MaskDateDirective,
   ],
   imports: [
     BrowserModule,
@@ -48,7 +59,8 @@ registerLocaleData(ptBr);
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TextMaskModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'pt' },

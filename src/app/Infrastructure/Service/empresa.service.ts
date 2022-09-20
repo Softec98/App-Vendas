@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, of } from 'rxjs';
+import { Buffer } from 'buffer/';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,7 @@ export class EmpresaService {
       const url = `https://api.cnpja.com/office/${cnpj}`;
       const httpOptions = {
         headers: new HttpHeaders({
-          'authorization': atob(apiKey)
+          'authorization': Buffer.from(apiKey, 'base64').toString('binary') // depracated: atob(apiKey)
         })
       };
 

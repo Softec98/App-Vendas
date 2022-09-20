@@ -23,7 +23,7 @@
       "dom"
     ],
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

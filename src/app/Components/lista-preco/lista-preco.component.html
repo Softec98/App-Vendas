@@ -72,8 +72,11 @@
 					<div fxFlex="50%" fxFlex.xs="100%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Cliente</mat-label>
-							<input matInput placeholder="Buscar cliente" #inputCliente (keyup)="BuscarEmpresa($event)">
-							<mat-icon matSuffix>search</mat-icon>
+							<input matInput placeholder="Buscar cliente" [textMask]="cnpjMask"
+								(keyup)="BuscarEmpresa($event)" SelectOnFoscus #inputCliente>
+							<button matSuffix mat-button>
+								<mat-icon (click)="BuscarEmpresaIcon(inputCliente.value)">search</mat-icon>
+							</button>
 						</mat-form-field>
 					</div>
 				</div>
@@ -82,13 +85,40 @@
 					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Nome</mat-label>
-							<input matInput placeholder="Nome do cliente" formControlName="nome">
+							<input matInput placeholder="Nome do cliente" formControlName="nome" #inputNome>
 						</mat-form-field>
 					</div>
 				</div>
 
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="75%" fxFlex.xs="80%" fxLayout="column">
+					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<mat-label>Fantasia</mat-label>
+							<input matInput placeholder="Nome fantasia do cliente" formControlName="fantasia">
+						</mat-form-field>
+					</div>
+				</div>
+
+				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
+					<div fxFlex="35%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<span matPrefix> </span>
+							<mat-label>CEP</mat-label>
+							<input matInput placeholder="CEP" formControlName="cep" (keyup.enter)="ObterEndereco()"
+								appMaskCep appSelectOnFocus>
+							<button matSuffix mat-button>
+								<mat-icon (click)="ObterEndereco()">search</mat-icon>
+							</button>
+						</mat-form-field>
+					</div>
+					<div fxFlex="20%" fxFlex.xs="100%" fxLayout="column">
+						<input type="checkbox" formControlName="me" id="me" class="form-check-input">
+						<label class="form-check-label" for="indMe">Micro empresa?</label>
+					</div>
+				</div>
+
+				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
+					<div fxFlex="60%" fxFlex.xs="60%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Endereço</mat-label>
 							<input matInput placeholder="Endereço do cliente" formControlName="endereco">
@@ -100,22 +130,56 @@
 							<input matInput placeholder="Número do endereço" formControlName="numero">
 						</mat-form-field>
 					</div>
+					<div fxFlex="16%" fxFlex.xs="20%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<mat-label>Complemento</mat-label>
+							<input matInput placeholder="Complemento do endereço" formControlName="complemento">
+						</mat-form-field>
+					</div>
 				</div>
 
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="75%" fxFlex.xs="80%" fxLayout="column">
+					<div fxFlex="40%" fxFlex.xs="40%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<mat-label>Bairro</mat-label>
+							<input matInput placeholder="Bairro do cliente" formControlName="bairro">
+						</mat-form-field>
+					</div>
+					<div fxFlex="40%" fxFlex.xs="40%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Cidade</mat-label>
 							<input matInput placeholder="Cidade do cliente" formControlName="cidade">
 						</mat-form-field>
 					</div>
-					<div fxFlex="16%" fxFlex.xs="20%" fxLayout="column">
+					<div fxFlex="10%" fxFlex.xs="15%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Estado</mat-label>
 							<input matInput placeholder="UF" formControlName="uf">
 						</mat-form-field>
 					</div>
 				</div>
+
+				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
+
+					<div fxFlex="10%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<span matPrefix> </span>
+							<mat-label>DDD</mat-label>
+							<input matInput placeholder="DDD" formControlName="ddd" maxlength="2" appSelectOnFocus>
+						</mat-form-field>
+					</div>
+
+					<div fxFlex="40%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<mat-label>Telefone</mat-label>
+							<span matPrefix></span>
+							<mat-icon matPrefix>phone</mat-icon>
+							<input matInput placeholder="Telefone" formControlName="fone" [textMask]="foneMask(8)"
+								appSelectOnFocus>
+						</mat-form-field>
+					</div>
+				</div>
+
 			</form>
 
 		</mat-card>

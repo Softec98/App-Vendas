@@ -7,6 +7,8 @@ import { ProdutoLista } from 'src/app/Core/Entities/ProdutoLista'
 import { MatInput } from '@angular/material/input';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { EmpresaService } from 'src/app/Infrastructure/Service/empresa.service';
+import { Utils } from 'src/app/Utils/Utils';
+import { CepService } from 'src/app/Infrastructure/Service/cep.service';
 
 export class Group {
 	level = 0;
@@ -40,9 +42,19 @@ export class ListaPrecoComponent implements OnInit {
 
 	public form!: FormGroup;
 
+	cnpjMask = Utils.cnpjMask;
+	foneMask(numberLength = 9) {
+		return {
+			guide: true,
+			showMask: true,
+			mask: numberLength == 9 ? Utils.fone9Mask : Utils.fone8Mask
+		}
+	}
+
 	constructor(
 		protected dataService: DataService,
 		protected empresaService: EmpresaService,
+		protected cepService: CepService,
 		private formBuilder: FormBuilder
 	) {
 		this.columns = [
@@ -82,10 +94,18 @@ export class ListaPrecoComponent implements OnInit {
 
 		this.form = this.formBuilder.group({
 			nome: [''],
+			fantasia: [''],
+			cep: [''],
 			endereco: [''],
+			complemento: [''],
 			numero: [''],
+			bairro: [''],
 			cidade: [''],
-			uf: ['']
+			uf: [''],
+			me: [''],
+			ddd: [''],
+			fone: [''],
+			pais: ['']
 		});
 
 		await this.ObterListaDePreco();
@@ -247,30 +267,64 @@ export class ListaPrecoComponent implements OnInit {
 	}
 
 	BuscarEmpresa(event: Event): void {
-
 		const cnpj = (event.target as HTMLInputElement).value.match(/\d/g)?.join('');
-	
+		this.BuscarEmpresaIcon(cnpj);
+	}
+
+	BuscarEmpresaIcon(cnpj?: string): void {
+		cnpj = cnpj?.match(/\d/g)?.join('');
 		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && cnpj.length == 14) {
-	
-		  this.empresaService.obterEmpresa(cnpj)
-			.subscribe({
-			  next: (empresa: any) => {
-				if (this) {
-					this.form.patchValue({
-						nome: empresa.company.name,
-						endereco: empresa.address.street,
-						cidade: empresa.address.city,
-						uf: empresa.address.state
-					  });
-				}
-				//this.focarNoNumero();
-			  },
-			  error: (err: any) => {
-				alert(`Erro ao buscar o Empresa: ${err.message}`);
-			  }
-			});
+			this.empresaService.obterEmpresa(cnpj)
+				.subscribe({
+					next: (empresa: any) => {
+						if (this) {
+							this.form.patchValue({
+								nome: empresa.company.name,
+								fantasia: empresa.alias,
+								cep: empresa.address.zip,
+								endereco: empresa.address.street,
+								numero: empresa.address.number,
+								bairro: empresa.address.district,
+								cidade: empresa.address.city,
+								uf: empresa.address.state,
+								me: empresa.company.size.text == "Microempresa",
+								pais: empresa.address.country.name
+							});
+						}
+						//this.focarNoNumero();
+					},
+					error: (err: any) => {
+						alert(`Não foi possível encontrar a empresa,\nverifique se o CNPJ está correto.`);
+					}
+				});
 		}
-	  }
+	}
+
+	ObterEndereco() {
+
+		let cep: string = this.form.controls['cep'].value.match(/\d/g)?.join('');
+
+		if (typeof cep !== 'undefined' && cep !== null && cep !== '') { //  && this.form.controls['cep'].valid
+
+			this.cepService.ObterEndereco(cep)
+				.subscribe({
+					next: (endereco: any) => {
+						if (this)
+							this.form.patchValue({
+								endereco: endereco.logradouro,
+								complemento: endereco.complemento,
+								bairro: endereco.bairro,
+								uf: endereco.uf,
+								cidade: endereco.localidade
+							});
+						//this.focarNoNumero();
+					},
+					error: (err: any) => {
+						alert(`Erro ao buscar o CEP: ${err.message}`);
+					}
+				});
+		}
+	}
 
 	private compare(a: any, b: any, isAsc: any) {
 		return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
