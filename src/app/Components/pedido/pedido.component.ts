@@ -15,6 +15,7 @@ import { VERSION } from '@angular/material/core';
 import { RepositionScrollStrategy } from '@angular/cdk/overlay';
 import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
 import { PedidoLista } from 'src/app/Core/Entities/PedidoLista';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-pedido',
@@ -35,10 +36,12 @@ export class PedidoComponent implements OnInit {
   clientes: IAuxiliar[] = [];
   status: IAuxiliar[] = [];
   fretes: IAuxiliar[] = [];
+  public form!: FormGroup;
 
   constructor(protected dataService: DataService,
               private media: MediaObserver,
-              private changeDetectorRef: ChangeDetectorRef) { 
+              private changeDetectorRef: ChangeDetectorRef,
+              private formBuilder: FormBuilder,) { 
   }
 
   private carregarSeletores() {
@@ -70,6 +73,13 @@ export class PedidoComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   async ngOnInit(): Promise<void> {
+
+		this.form = this.formBuilder.group({
+			Frete: [''],
+      Id_Cliente: [''],
+      Id_Status: ['']
+		});
+
     this.panelOpenState = !(this.media.isActive('xs') || this.media.isActive('sm') || this.media.isActive('lt-md'))
     this.carregarSeletores();
     let pedidos = [...await this.dataService.obterPedidos()].map(pedido => new PedidoLista(pedido));
@@ -84,14 +94,14 @@ export class PedidoComponent implements OnInit {
         if (filter.includes(':')) {
           const valor: string = filter.split(':')[1].toString();
           if (valor !== '-1') {
-            const selectArray: string[] = [ 'ClienteId', 'FreteId', 'StatusId'];
+            const selectArray: string[] = [ 'Id_Cliente', 'Frete', 'Id_Status'];
             const indice = selectArray.indexOf(filter.split(':')[0]);
             if (indice > -1)
               retorno = data[selectArray[indice]] == valor
           }
         }
         else 
-          retorno = filter.length < 3 || data.Name.toLowerCase().includes(filter) ? true : false; 
+          retorno = filter.length < 3 || data.NomeCliente.toLowerCase().includes(filter) ? true : false; 
         return retorno;
       }
     this.registros = pedidos.length + 1;

@@ -7,7 +7,7 @@
     <div class="container">
 
       <mat-card class="card">
-
+        <form [formGroup]="form">
         <mat-card-content>
 
           <div>
@@ -36,8 +36,8 @@
                   <div fxFlex="16%" fxFlex.xs="100%" fxLayout="column" *ngIf="exppanel.expanded">
                     <mat-form-field appearance="outline">
                       <mat-label>Cliente</mat-label>
-                      <mat-select matInput placeholder="Cliente"
-                        formControlName="ClienteId" (selectionChange)="onselect($event)">
+                      <mat-select matInput placeholder="Cliente" 
+                        formControlName="Id_Cliente" (selectionChange)="onselect($event)">
                         <mat-option value="-1">[ Selecione o cliente ]</mat-option>
                         <mat-option *ngFor="let cl of clientes" [value]="cl.key">
                           {{ cl.value }}
@@ -50,7 +50,7 @@
                     <mat-form-field appearance="outline">
                       <mat-label>Frete</mat-label>
                       <mat-select matInput placeholder="Frete"
-                        formControlName="FreteId" (selectionChange)="onselect($event)">
+                        formControlName="Frete" (selectionChange)="onselect($event)">
                         <mat-option value="-1">[ Selecione o frete ]</mat-option>
                         <mat-option *ngFor="let fr of fretes" [value]="fr.key">
                           {{ fr.value }}
@@ -63,7 +63,7 @@
                     <mat-form-field appearance="outline">
                       <mat-label>Status</mat-label>
                       <mat-select matInput placeholder="Status" 
-                        formControlName="StatusId" (selectionChange)="onselect($event)">
+                        formControlName="Id_Status" (selectionChange)="onselect($event)">
                         <mat-option value="-1">[ Selecione o status ]</mat-option>
                         <mat-option *ngFor="let st of status" [value]="st.key">
                           {{ st.value }}
@@ -144,7 +144,7 @@
           </div>
 
         </mat-card-content>
-
+        </form>
       </mat-card>
     </div>
   </div>
