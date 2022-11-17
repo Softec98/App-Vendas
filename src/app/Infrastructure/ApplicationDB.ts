@@ -19,6 +19,9 @@ import ncm from '../../assets/data/NCM.json'
 import condPagto from '../../assets/data/CondPagto.json'
 import prodPreco from '../../assets/data/ProdPreco.json'
 import produtos from '../../assets/data/Produtos.json'
+import statusJ from '../../assets/data/Status.json'
+import fretesJ from '../../assets/data/Frete.json'
+import { IAuxiliar } from '../Core/Interface/IAuxiliar';
 
 export class ApplicationDB extends Dexie {
 
@@ -34,6 +37,10 @@ export class ApplicationDB extends Dexie {
   ProdutoPreco!: Table<ProdutoPrecoDB, number>;
   Produtos!: Table<ProdutosDB, number>;
 
+  clientes: IAuxiliar[] = [];
+  fretes: IAuxiliar[] = [];
+  status: IAuxiliar[] = [];
+  
   constructor() {
     super('AppVendasDB');
     this.version(1).stores({
@@ -63,13 +70,32 @@ export class ApplicationDB extends Dexie {
     this.Produtos.mapToClass(ProdutosDB);
 
     this.on('populate', () => this.populate());
-
     this.on('ready', () => this.pronto())
   }
 
   async pronto() {
     if (await db.Produtos.count() > 0) {
         console.log("Banco de dados pronto para uso!");
+    }
+
+    if (await db.Clientes.count() > 0) {
+      if (this.clientes.length == 0) {
+        (await db.Clientes.toArray()).forEach(cliente => {
+          this.clientes.push({ key: cliente.Id, value: cliente.xNome })
+        });
+      }
+    }
+
+    if (this.fretes.length == 0) {
+      fretesJ.forEach(frete => {
+        this.fretes.push({ key: frete.key, value: frete.value });
+      });
+    }
+
+    if (this.status.length == 0) {
+      statusJ.forEach(stat => {
+        this.status.push({ key: stat.key, value: stat.value });
+      });
     }
   }
 
@@ -95,6 +121,10 @@ export const familiaJson = prodFamilia;
 export const embalagemJson = embalagem;
 export const grupoJson = prodGrupo;
 export const precoJson = prodPreco;
+export const ncmJson = ncm;
+export const status = db.status;
+export const fretes = db.fretes;
+export const clientes = db.clientes;
 
 export class DynamicClass {
   constructor(className: string, opts: any) {

@@ -18,8 +18,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TextMaskModule } from 'angular2-text-mask'; 
+import { TextMaskModule } from 'angular2-text-mask';
 
 import ptBr from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
@@ -28,6 +29,8 @@ import { CnpjPipe } from './Infrastructure/Pipes/cnpj.pipe';
 import { SelectOnFoscusDirective } from './Infrastructure/Directives/select-on-foscus.directive';
 import { MaskCepDirective } from './Infrastructure/Directives/mask-cep.directive';
 import { MaskDateDirective } from './Infrastructure/Directives/mask-date.directive';
+import { PedidoComponent } from './Components/pedido/pedido.component';
+import { MaterialModule } from './material.module';
 
 registerLocaleData(ptBr);
 
@@ -41,8 +44,10 @@ registerLocaleData(ptBr);
     SelectOnFoscusDirective,
     MaskCepDirective,
     MaskDateDirective,
+    PedidoComponent,
   ],
   imports: [
+    MaterialModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -58,6 +63,7 @@ registerLocaleData(ptBr);
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
     TextMaskModule

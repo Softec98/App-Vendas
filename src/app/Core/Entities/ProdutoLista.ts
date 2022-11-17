@@ -4,6 +4,7 @@ import { ProdutosDB } from "./Produtos";
 
 export class ProdutoLista {
 
+    public Id?: number;
     public cProd!: string;
     public Unid!: string;
     public xProd!: string;

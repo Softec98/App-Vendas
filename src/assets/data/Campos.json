@@ -1,0 +1,22 @@
+[
+    {
+        "Form": "Cliente",
+        "Fields": [
+            {
+                "name": "cnpj",
+                "description": "C.N.P.J",
+                "required": true
+            },
+            {
+                "name": "nome",
+                "description": "Nome",
+                "required": true
+            },
+            {
+                "name": "email",
+                "description": "E-mail",
+                "required": false
+            }
+        ]
+    }
+]

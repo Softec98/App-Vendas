@@ -71,21 +71,54 @@
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
 					<div fxFlex="50%" fxFlex.xs="100%" fxLayout="column">
 						<mat-form-field appearance="outline">
-							<mat-label>Cliente</mat-label>
-							<input matInput placeholder="Buscar cliente" [textMask]="cnpjMask"
-								(keyup)="BuscarEmpresa($event)" SelectOnFoscus #inputCliente>
+							<mat-label>CNPJ</mat-label>
+							<input matInput placeholder="Buscar cliente" [textMask]="documentoMask"
+								(keyup)="BuscarEmpresa($event)" SelectOnFoscus #inputCliente formControlName="cnpj">
 							<button matSuffix mat-button>
 								<mat-icon (click)="BuscarEmpresaIcon(inputCliente.value)">search</mat-icon>
 							</button>
+							<input matInput formControlName="Id" [hidden]="true">
+							<mat-error *ngFor="let validation of validation_messages.cnpj">
+								<mat-error class="error-message"
+									*ngIf="form.controls['cnpj'].errors?.[validation.type] && (form.controls['cnpj'].dirty || form.controls['cnpj'].touched)">
+									{{validation.message}}
+								</mat-error>
+							</mat-error>
 						</mat-form-field>
 					</div>
+
+					<div>
+						<button type="button" mat-raised-button color="primary"
+							style="float:inline-end;margin-top: 10px" [disabled]="form.controls['nome'].value == ''"
+							(click)="form.reset();">Limpar</button>
+					</div>
+					<div>
+						<button type="button" mat-raised-button color="primary"
+							style="float:inline-end;margin-top: 10px" [disabled]="form.controls['nome'].value == ''"
+							(click)="SalvarPedido()">Salvar</button>
+					</div>
+
 				</div>
+
+				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
+					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<mat-label>Inscrição Estadual</mat-label>
+							<input matInput placeholder="Inscrição Estadual" formControlName="IE">
+						</mat-form-field>
+					</div>
+				</div>				
 
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
 					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Nome</mat-label>
 							<input matInput placeholder="Nome do cliente" formControlName="nome" #inputNome>
+							<mat-error *ngFor="let validation of validation_messages.nome">
+								<mat-error class="error-message"
+									*ngIf="form.controls['nome'].errors?.[validation.type] && (form.controls['nome'].dirty || form.controls['nome'].touched)">
+									{{validation.message}}</mat-error>
+							</mat-error>
 						</mat-form-field>
 					</div>
 				</div>
@@ -105,7 +138,7 @@
 							<span matPrefix> </span>
 							<mat-label>CEP</mat-label>
 							<input matInput placeholder="CEP" formControlName="cep" (keyup.enter)="ObterEndereco()"
-								appMaskCep appSelectOnFocus>
+								appMaskCep appSelectOnFocus [textMask]="cepMask">
 							<button matSuffix mat-button>
 								<mat-icon (click)="ObterEndereco()">search</mat-icon>
 							</button>
@@ -124,13 +157,13 @@
 							<input matInput placeholder="Endereço do cliente" formControlName="endereco">
 						</mat-form-field>
 					</div>
-					<div fxFlex="16%" fxFlex.xs="20%" fxLayout="column">
+					<div fxFlex="12%" fxFlex.xs="20%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Número</mat-label>
 							<input matInput placeholder="Número do endereço" formControlName="numero">
 						</mat-form-field>
 					</div>
-					<div fxFlex="16%" fxFlex.xs="20%" fxLayout="column">
+					<div fxFlex="18%" fxFlex.xs="20%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Complemento</mat-label>
 							<input matInput placeholder="Complemento do endereço" formControlName="complemento">
@@ -139,29 +172,34 @@
 				</div>
 
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="40%" fxFlex.xs="40%" fxLayout="column">
+					<div fxFlex="35%" fxFlex.xs="40%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Bairro</mat-label>
 							<input matInput placeholder="Bairro do cliente" formControlName="bairro">
 						</mat-form-field>
 					</div>
-					<div fxFlex="40%" fxFlex.xs="40%" fxLayout="column">
+					<div fxFlex="35%" fxFlex.xs="40%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<mat-label>Cidade</mat-label>
 							<input matInput placeholder="Cidade do cliente" formControlName="cidade">
 						</mat-form-field>
 					</div>
-					<div fxFlex="10%" fxFlex.xs="15%" fxLayout="column">
+					<div fxFlex="20%" fxFlex.xs="15%" fxLayout="column">
 						<mat-form-field appearance="outline">
-							<mat-label>Estado</mat-label>
-							<input matInput placeholder="UF" formControlName="uf">
+							<mat-label>UF</mat-label>
+							<mat-select matInput placeholder="UF" formControlName="uf">
+								<mat-option value="-1">[ Selecione o estado ]</mat-option>
+								<mat-option *ngFor="let uf of Estados" [value]="uf.key">
+									{{ uf.key }}-{{ uf.value }}
+								</mat-option>
+							</mat-select>
 						</mat-form-field>
 					</div>
 				</div>
 
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
 
-					<div fxFlex="10%" fxFlex.xs="100%" fxLayout="column">
+					<div fxFlex="7%" fxFlex.xs="100%" fxLayout="column">
 						<mat-form-field appearance="outline">
 							<span matPrefix> </span>
 							<mat-label>DDD</mat-label>
@@ -169,15 +207,48 @@
 						</mat-form-field>
 					</div>
 
-					<div fxFlex="40%" fxFlex.xs="100%" fxLayout="column">
+					<div fxFlex="39%" fxFlex.xs="100%" fxLayout="column">
 						<mat-form-field appearance="outline">
-							<mat-label>Telefone</mat-label>
+							<mat-label>1º Telefone</mat-label>
 							<span matPrefix></span>
 							<mat-icon matPrefix>phone</mat-icon>
-							<input matInput placeholder="Telefone" formControlName="fone" [textMask]="foneMask(8)"
+							<input matInput placeholder="1º telefone" formControlName="fone" [textMask]="foneMask"
 								appSelectOnFocus>
 						</mat-form-field>
 					</div>
+
+					<div fxFlex="7%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<span matPrefix> </span>
+							<mat-label>DDD</mat-label>
+							<input matInput placeholder="DDD" formControlName="ddd2" maxlength="2" appSelectOnFocus>
+						</mat-form-field>
+					</div>
+
+					<div fxFlex="38%" fxFlex.xs="100%" fxLayout="column">
+						<mat-form-field appearance="outline">
+							<mat-label>2º Telefone</mat-label>
+							<span matPrefix></span>
+							<mat-icon matPrefix>phone</mat-icon>
+							<input matInput placeholder="2º telefone" formControlName="fone2" [textMask]="foneMask"
+								appSelectOnFocus>
+						</mat-form-field>
+					</div>
+				</div>
+
+				<div>
+					<mat-form-field appearance="outline">
+						<mat-label>E-mail</mat-label>
+						<mat-icon matPrefix>email</mat-icon>
+						<span matPrefix></span>
+						<input formControlName="email" matInput placeholder="E-mail" maxlength="100" type="email">
+						<mat-error *ngFor="let validation of validation_messages.email">
+							<mat-error class="error-message"
+								*ngIf="form.controls['email'].errors?.[validation.type] && (form.controls['email'].dirty || form.controls['email'].touched)">
+								{{validation.message}}
+							</mat-error>
+						</mat-error>
+					</mat-form-field>
 				</div>
 
 			</form>

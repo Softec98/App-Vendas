@@ -31,27 +31,24 @@ export class ProdutosDB {
         const grupos: ProdutoGrupoDB[] = grupoJson;
         const precos: ProdutoPrecoDB[] = precoJson;
 
-        if (typeof (this.Id_Embalagem) == 'undefined' && familia.length > 0) {
+        if (typeof (this.Id_Embalagem) == 'undefined' && familia.length > 0)
             this.Id_Embalagem = familia.find(x => x.Id == this.Id_Produto_Familia)!.Id_Embalagem!;
-        }
 
         const embalagem = embalagens.find(x => x.Id == this.Id_Embalagem)!;
 
         if (typeof (embalagem) !== 'undefined') {
-            if (typeof (this.Unid) == 'undefined') {
+            if (typeof (this.Unid) == 'undefined')
                 this.Unid = embalagem?.cEmbalagem!;
-            }
-            if (typeof (this.pLiquido) == 'undefined') {
+
+            if (typeof (this.pLiquido) == 'undefined')
                 this.pLiquido = embalagem?.Peso!;
-            }
-            if (typeof (this.pBruto) == 'undefined') {
+
+            if (typeof (this.pBruto) == 'undefined')
                 this.pBruto = embalagem?.Peso! + embalagem?.pEmbalagem!;
-            }
         }
 
-        if (typeof (this.Id_NCM) == 'undefined' && grupos.length > 0) {
+        if (typeof (this.Id_NCM) == 'undefined' && grupos.length > 0)
             this.Id_NCM = grupos.find(x => x.Id == this.Id_Produto_Grupo)!.Id_NCM!;
-        }
 
         if (typeof (this.vVenda) == 'undefined' && precos.length > 0) {
             const preco = precos.find(x => x.Id_Cond_Pagto == 1 && (

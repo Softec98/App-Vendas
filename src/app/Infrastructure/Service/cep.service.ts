@@ -43,7 +43,7 @@ export class CepService {
         baseApi = environment.zipCodeEndPoint_pt_BR;
       }
 
-      let api = (baseApi.filter(function (x) { return x.Id === fonte })[0]);
+      let api = baseApi.filter(function (x) { return x.Id === fonte })[0];
 
       const httpOptions = {
         headers: new HttpHeaders({

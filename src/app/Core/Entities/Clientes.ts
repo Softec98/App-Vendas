@@ -17,6 +17,7 @@ export class ClientesDB extends BaseEntity {
     public UF!: string;
     public cPais!: number;
     public xPais!: string;
+    public CEP!: string;
     public fone!: string;
     public fone2!: string;
     public CRT!: number;

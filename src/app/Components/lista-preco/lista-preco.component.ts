@@ -9,6 +9,16 @@ import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms'
 import { EmpresaService } from 'src/app/Infrastructure/Service/empresa.service';
 import { Utils } from 'src/app/Utils/Utils';
 import { CepService } from 'src/app/Infrastructure/Service/cep.service';
+import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
+import cliente_validation from "../../../assets/data/Cliente-validation.json";
+import { ClientesDB } from 'src/app/Core/Entities/Clientes';
+import { PedidosDB } from 'src/app/Core/Entities/Pedidos';
+import { PedidosItensDB } from 'src/app/Core/Entities/PedidosItens';
+import { ncmJson } from 'src/app/Infrastructure/ApplicationDB';
+import { NCMDB } from 'src/app/Core/Entities/NCM';
+import { EFrete } from 'src/app/Core/Enums/EFrete.enum';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 export class Group {
 	level = 0;
@@ -24,6 +34,8 @@ export class Group {
 
 export class ListaPrecoComponent implements OnInit {
 
+	validation_messages = cliente_validation;
+
 	public dataSource = new MatTableDataSource<any | Group>([]);
 
 	columns: any[];
@@ -34,6 +46,7 @@ export class ListaPrecoComponent implements OnInit {
 
 	expandedProduto: any[] = [];
 	expandedSubProduto: ProdutoLista[] = [];
+	Estados: IAuxiliar[] = [];
 
 	editRowId: number = -1
 
@@ -42,20 +55,16 @@ export class ListaPrecoComponent implements OnInit {
 
 	public form!: FormGroup;
 
-	cnpjMask = Utils.cnpjMask;
-	foneMask(numberLength = 9) {
-		return {
-			guide: true,
-			showMask: true,
-			mask: numberLength == 9 ? Utils.fone9Mask : Utils.fone8Mask
-		}
-	}
+	cepMask = Utils.cepMask;
+	foneMask = Utils.foneMask();
+	documentoMask = Utils.documentoMask();
 
 	constructor(
 		protected dataService: DataService,
 		protected empresaService: EmpresaService,
 		protected cepService: CepService,
-		private formBuilder: FormBuilder
+		private formBuilder: FormBuilder,
+		private router: Router
 	) {
 		this.columns = [
 			{
@@ -91,9 +100,20 @@ export class ListaPrecoComponent implements OnInit {
 	}
 
 	async ngOnInit(): Promise<void> {
+		this.dataService.ObterEstados().subscribe(data => {
+			this.Estados = data;
+		});
 
 		this.form = this.formBuilder.group({
-			nome: [''],
+			id: [0],
+			cnpj: this.formBuilder.control({ value: '', disabled: false }, Utils.isDocumento()),
+			IE: [''],
+			nome: new FormControl('', Validators.compose([
+				Validators.required,
+				Validators.pattern(/^[a-zA-Z].*[\s\.]*$/),
+				Validators.maxLength(100),
+				Validators.minLength(5)
+			])),
 			fantasia: [''],
 			cep: [''],
 			endereco: [''],
@@ -104,27 +124,20 @@ export class ListaPrecoComponent implements OnInit {
 			uf: [''],
 			me: [''],
 			ddd: [''],
-			fone: [''],
+			ddd2: [''],
+			email: ['', Validators.email], 
+			fone: ['', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
+			fone2: ['', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
 			pais: ['']
 		});
 
 		await this.ObterListaDePreco();
-
-		// this.dataSource.filterPredicate =
-		// 	(data: any, filter: string) => {
-		// 		let retorno: boolean = true;
-		// 		if (filter.length > 2 && data instanceof ProdutoLista) {
-		// 			retorno = data.xProd.toLowerCase().includes(filter) ? true : false;
-		// 		}
-		// 		return retorno;
-		// 	}
 	}
 
 	async applyFilter(event: Event) {
 		const filterValue = (event.target as HTMLInputElement).value;
 		if (filterValue.length == 0 || filterValue.length > 2) {
 			await this.ObterListaDePreco(filterValue);
-			//this.dataSource.filter = filterValue.trim().toLowerCase();
 		}
 	}
 
@@ -271,41 +284,71 @@ export class ListaPrecoComponent implements OnInit {
 		this.BuscarEmpresaIcon(cnpj);
 	}
 
-	BuscarEmpresaIcon(cnpj?: string): void {
+	async BuscarEmpresaIcon(cnpj?: string): Promise<void> {
 		cnpj = cnpj?.match(/\d/g)?.join('');
-		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && cnpj.length == 14) {
-			this.empresaService.obterEmpresa(cnpj)
-				.subscribe({
-					next: (empresa: any) => {
-						if (this) {
-							this.form.patchValue({
-								nome: empresa.company.name,
-								fantasia: empresa.alias,
-								cep: empresa.address.zip,
-								endereco: empresa.address.street,
-								numero: empresa.address.number,
-								bairro: empresa.address.district,
-								cidade: empresa.address.city,
-								uf: empresa.address.state,
-								me: empresa.company.size.text == "Microempresa",
-								pais: empresa.address.country.name
-							});
-						}
-						//this.focarNoNumero();
-					},
-					error: (err: any) => {
-						alert(`Não foi possível encontrar a empresa,\nverifique se o CNPJ está correto.`);
-					}
+		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && 
+			cnpj.length == 14 && this.form.controls['cnpj'].valid) {
+			var cliente = await this.dataService.obterClientePeloCnpj(cnpj);
+			if (cliente != null) {
+				this.form.patchValue({
+					id: cliente.Id,
+					nome: cliente.xNome,
+					IE: cliente.IE,
+					fantasia: cliente.xFantasia,
+					cep: cliente.CEP,
+					endereco: cliente.xLgr,
+					numero: cliente.nro,
+					complemento: cliente.xComplemento,
+					bairro: cliente.cBairro,
+					cidade: cliente.xMun,
+					uf: cliente.UF,
+					me: cliente.indME,
+					pais: cliente.cPais,
+					email: cliente.email,
+					ddd: cliente.fone?.split(' ')[0] ?? '',
+					fone: cliente.fone?.split(' ')[1] ?? '',
+					ddd2: cliente.fone2?.split(' ')[0] ?? '',
+					fone2: cliente.fone2?.split(' ')[1] ?? '',
 				});
+			}
+			else {
+				this.empresaService.obterEmpresa(cnpj)
+					.subscribe({
+						next: (empresa: any) => {
+							if (this) {
+								this.form.patchValue({
+									id: 0,
+									nome: empresa.company.name,
+									fantasia: empresa.alias!,
+									cep: empresa.address.zip,
+									endereco: empresa.address.street,
+									numero: empresa.address.number,
+									complemento: empresa.address.details!,
+									bairro: empresa.address.district,
+									cidade: empresa.address.city,
+									uf: empresa.address.state,
+									me: empresa.company.size.text == "Microempresa",
+									pais: empresa.address.country.name,
+									email: empresa.emails.length > 0 ? empresa.emails[0].address : '',
+									ddd: empresa.phones.length > 0 ? empresa.phones[0].area : '',
+									fone: empresa.phones.length > 0 ? empresa.phones[0].number : '',
+									ddd2: empresa.phones.length > 1 ? empresa.phones[1].area : '',
+									fone2: empresa.phones.length > 1 ? empresa.phones[1].number : ''
+								});
+							}
+							//this.focarNoNumero();
+						},
+						error: (err: any) => {
+							alert(`Não foi possível encontrar a empresa,\nverifique se o CNPJ está correto.`);
+						}
+					});
+			}
 		}
 	}
 
 	ObterEndereco() {
-
 		let cep: string = this.form.controls['cep'].value.match(/\d/g)?.join('');
-
-		if (typeof cep !== 'undefined' && cep !== null && cep !== '') { //  && this.form.controls['cep'].valid
-
+		if (typeof cep !== 'undefined' && cep !== null && cep !== '' && this.form.controls['cep'].valid) {
 			this.cepService.ObterEndereco(cep)
 				.subscribe({
 					next: (endereco: any) => {
@@ -317,7 +360,6 @@ export class ListaPrecoComponent implements OnInit {
 								uf: endereco.uf,
 								cidade: endereco.localidade
 							});
-						//this.focarNoNumero();
 					},
 					error: (err: any) => {
 						alert(`Erro ao buscar o CEP: ${err.message}`);
@@ -326,6 +368,100 @@ export class ListaPrecoComponent implements OnInit {
 		}
 	}
 
+	async SalvarPedido() {
+		const ncm: NCMDB[] = ncmJson;
+		let idCliente = 0;
+		let uf = ''
+		let cnpj: string = this.form.controls['cnpj'].value.match(/\d/g)?.join('');
+		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && 
+			(cnpj.length == 11 || cnpj.length == 14) && this.form.controls['cnpj'].valid) {
+			let cliente = new ClientesDB();
+			if (this.form.controls['id'].value != '0') {
+				cliente.Id = this.form.controls['id'].value; }
+				cliente.CNPJ = cnpj;
+				cliente.IE = this.form.controls['IE'].value;
+				cliente.xNome = this.form.controls['nome'].value;
+				cliente.xFantasia = this.form.controls['fantasia'].value;
+				cliente.CEP = this.form.controls['cep'].value;
+				cliente.xLgr = this.form.controls['endereco'].value;
+				cliente.nro = this.form.controls['numero'].value;
+				cliente.xComplemento = this.form.controls['complemento'].value;
+				cliente.cBairro = this.form.controls['bairro'].value;
+				cliente.xMun = this.form.controls['cidade'].value;
+				cliente.UF = this.form.controls['uf'].value;
+				cliente.indME = this.form.controls['me'].value;
+				cliente.cPais = this.form.controls['pais'].value;
+				cliente.email = this.form.controls['email'].value;
+				cliente.fone = this.form.controls['ddd'].value + ' ' + this.form.controls['fone'].value;
+				cliente.fone2 = this.form.controls['ddd2'].value + ' ' + this.form.controls['fone2'].value;
+				uf = cliente.UF;
+				idCliente = await this.dataService.SalvarCliente(cliente);
+				this.form.patchValue({
+					id: idCliente
+				});
+			}
+ 
+			if (idCliente > 0) {
+				let condpg = await this.dataService.obterCondPagtoPorId(environment.Id_Cond_Pagto[0]);
+				let pedido = new PedidosDB();
+				pedido.Id_Cond_Pagto = environment.Id_Cond_Pagto[0];
+				pedido.Id_Cliente = idCliente;
+				pedido.Id_Status = 1;
+				pedido.Frete = condpg?.Frete!
+				pedido.Id_Pagto_Codigo = 1;
+				pedido.Parcelas = 1;
+				pedido.datCadastro = new Date();
+				pedido.datEmissao = new Date();
+				pedido.PedidosItens = [];
+				if (this.allData) {
+					const itensQtd = this.allData.filter(function (x) { return x.qProd > 0 });
+					itensQtd.map(item => {
+						let pedidoItem = new PedidosItensDB();
+						pedidoItem.Id_Produto = item.Id;
+						pedidoItem.NCM = ncm.find(x => item.Id_NCM == x.Id)?.NCM!;
+						pedidoItem.CFOP = uf == 'SP' ? 5101 : 6101;
+						pedidoItem.Unid = item.Unid;
+						pedidoItem.cProd = item.cProd;
+						pedidoItem.xProd = item.xProd;
+						pedidoItem.qProd = item.qProd;
+						pedidoItem.vProd = item.vVenda;
+						pedidoItem.vMerc = item.qProd * item.vVenda;
+						pedido.PedidosItens.push(pedidoItem);
+						pedido.Totalizar();
+					});
+				}
+				pedido.Salvar();
+			}
+			alert("O pedido foi salvo com sucesso!");
+			this.router.navigate(['/pedidos']);
+	}
+
+	// private ObterValidacao() {
+	// 	const xCnpj = this.ObterDescricaoCampo('cnpj');
+	// 	const xNome = this.ObterDescricaoCampo('nome');
+	// 	return {
+	// 		'cnpj': [
+	// 			Utils.ObterMensagem('O', xCnpj, 'minlength', 11),
+	// 			Utils.ObterMensagem('O', xCnpj, 'maxlength', 14),
+	// 			Utils.ObterMensagem('O', xCnpj, 'pattern', 0, ' é inválido'),
+	// 			Utils.ObterMensagem('O', xCnpj, 'required')
+	// 		],
+	// 		'nome': [
+	// 			Utils.ObterMensagem('O', xNome, 'maxlength', 100),
+	// 			Utils.ObterMensagem('O', xNome, 'minlength', 5),
+	// 			Utils.ObterMensagem('O', xNome, 'pattern', 0, 'deve conter somente letras'),
+	// 			Utils.ObterMensagem('O', xNome, 'required')
+	// 		],
+	// 		'email': [
+	// 			Utils.ObterMensagem('O', this.ObterDescricaoCampo('email'), 'email', 0, ' é inválido')
+	// 		]
+	// 	};
+	// }
+
+	// private ObterDescricaoCampo(campo: string) {
+	// 	return this.camposData?.Fields.find(x => x.name == campo)?.description ?? '';
+	// }
+
 	private compare(a: any, b: any, isAsc: any) {
 		return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 	}
@@ -333,8 +469,8 @@ export class ListaPrecoComponent implements OnInit {
 	private async ObterListaDePreco(filterValue: string = '') {
 		await this.dataService.obterProdutos(filterValue).then(
 			(data: any) => {
-				data.forEach((item: any) => { // , index: number
-					item.Id = item.Id; // index + 1;
+				data.forEach((item: any) => {
+					item.Id = item.Id;
 				});
 				this.allData = data.map((preco: Partial<ProdutosDB> | undefined) => new ProdutoLista(preco));
 				this.dataSource.data = this.getGroups(this.allData, this.groupByColumns);

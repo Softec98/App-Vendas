@@ -17,6 +17,9 @@ export const environment = {
   ],
   apiEndPoint: [
     'https://localhost:3000'
+  ],
+  Id_Cond_Pagto: [
+    1
   ]
 };
 
