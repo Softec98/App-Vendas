@@ -1,27 +1,19 @@
-<div fxLayout="column" fxLayoutAlign="left" fxLayoutGap="5px" fxLayoutGap.xs="2px" style="height: 100%">
-    <br>
-    <div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-        <div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
-            <h2 class="div-texto-botao" style="text-align: center">Seja bem-vindo!</h2>
-            <p style="text-align: center">Administre seus pedidos de forma<br />mais rápida e organizada!</p>
-        </div>
+<div>
+    <div class="item">
+        <p></p>
+        <h2 class="div-texto-botao" style="text-align: center">Seja bem-vindo!</h2>
+        <p style="text-align: center">Administre seus pedidos de forma<br />mais rápida e organizada!</p>
     </div>
-    <div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-        <div fxFlex="25%" xLayout="column" fxFlex.xs="100%">&nbsp;</div>
-        <div fxFlex="25%" fxFlex.xs="100%" xLayout="column" fxLayoutAlign="left" fxLayoutGap="5px" fxLayoutGap.xs="2px">
-                 <div class="mainmenu"><br>
-                        <h3 class="div-texto-botao">Novo<br> pedido</h3>
-                        <p>Cadastre por aqui seu novo pedido.</p>
-                        <button mat-raised-button color="primary" routerLink="novo_pedido">Cadastrar</button>
-                </div>
+    <div class="container">
+        <div class="mainmenu">
+            <h3 class="div-texto-botao">Novo<br> pedido</h3>
+            <p>Cadastre por aqui seu novo pedido.</p>
+            <button mat-raised-button color="primary" routerLink="novo_pedido">Cadastrar</button>
         </div>
-        <div fxFlex="25%" fxFlex.xs="100%" xLayout="column" fxLayoutAlign="left" fxLayoutGap="5px" fxLayoutGap.xs="2px">
-                    <div class="mainmenu"><br>
-                        <h3 class="div-texto-botao">Histórico pedido</h3>
-                        <p>Acesse aqui seu histórico de pedidos.</p>
-                        <button mat-raised-button color="primary" routerLink="pedidos">Acessar</button>
-                    </div>
-        </div>  
-        <div fxFlex="25%" xLayout="column" fxFlex.xs="100%">&nbsp;</div>   
+        <div class="mainmenu">
+            <h3 class="div-texto-botao">Histórico pedido</h3>
+            <p>Acesse aqui seu histórico de pedidos.</p>
+            <button mat-raised-button color="primary" routerLink="pedidos">Acessar</button>
+        </div>
     </div>
 </div>

@@ -4,6 +4,8 @@
 html,
 body {
   height: 100%;
+  margin: 0;
+  font-family: "Helvetica Neue", sans-serif, Roboto; // font-family: Roboto
 }
 
 :root {
@@ -25,10 +27,7 @@ body {
 }
 
 body {
-  margin: 0;
   background-color: var(--body);
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 * {
@@ -36,5 +35,3 @@ body {
     cursor: pointer;
   }
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -1,6 +1,6 @@
 <mat-sidenav-container>
     <mat-sidenav #sidenav role="navigation">
-      <mat-nav-list>
+      <mat-nav-list *ngIf="!hideSideMenu">
         <!-- <a mat-list-item *ngIf="!auth.isAuthenticated()" (click)="auth.login()">
           <mat-icon class="icon">input</mat-icon>
           <span class="label">Login</span>
@@ -32,23 +32,23 @@
     </mat-sidenav>
     <mat-sidenav-content>
       <mat-toolbar color="primary">
-        <div fxHide.gt-xs>
+        <div *ngIf="!hideSideMenu">
           <button mat-icon-button (click)="sidenav.toggle()">
             <mat-icon>menu</mat-icon>
           </button>
         </div>
-        <div style="width: 170px">
-          <img src="assets/images/windows11/SmallTile.scale-100.png" fxHide.lg
+        <div style="margin-top: 10px; width: 170px">
+          <img src="assets/images/windows11/SmallTile.scale-100.png"
             alt="Logo da empresa">
         </div>        
         <div>
           <a routerLink="/">
             <!-- <mat-icon class="icon">home</mat-icon> -->
-            <span class="label">Aplicativo de vendas</span>
+            <span class="label" [ngClass]="{'isPhonePortrait': !hideSideMenu}">Aplicativo de vendas</span>
           </a>
         </div>
-        <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
-          <ul fxLayout fxLayoutGap="20px" class="navigation-items">
+        <div class="menu" *ngIf="hideSideMenu">
+          <ul>
             <!-- <li>
               <a *ngIf="!auth.isAuthenticated()" (click)="auth.login()">
                 <mat-icon class="icon">input</mat-icon>
@@ -81,6 +81,7 @@
               </a>
             </li>
             <li>
+              &nbsp;
               <button type="button" (click)="toggle()">
                 <img src="assets/images/svg/{{ icon }}.svg" alt="Clique aqui para trocar para {{ textTheme }}.">
               </button>
@@ -93,12 +94,11 @@
               </a>
             </li> -->
           </ul>
-        </div>    
-
+        </div>
       </mat-toolbar>
 
-      <div class="logo" fxHide.xs>
-        <img src="assets/images/windows11/SmallTile.scale-200.png" fxHide.xs
+      <div class="logo" *ngIf="hideSideMenu">
+        <img src="assets/images/windows11/SmallTile.scale-200.png"
           alt="Logo da empresa">
       </div>
 

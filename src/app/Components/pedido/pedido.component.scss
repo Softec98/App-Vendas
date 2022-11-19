@@ -11,13 +11,12 @@
   td {
     overflow: hidden;
     width: auto;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
-  
+
   td:nth-child(1), 
   th:nth-child(1) {
-      width: 65px;
+      width: 100px;
       text-align: right !important;
   }
 
@@ -34,7 +33,8 @@
 
   td:nth-child(4), 
   th:nth-child(4) {
-    width: 40%;
+    width: 38%;
+    text-overflow: ellipsis;
   }
 
   td:nth-child(5), 
@@ -49,7 +49,7 @@
 
   td:last-child, 
   th:last-child {
-    width: 130px;
+    width: 180px;
     text-align: center !important;
   }
   
@@ -76,4 +76,34 @@
   
   .example-headers-align .mat-form-field + .mat-form-field {
     margin-left: 8px;
+  }
+
+  .linha {
+    flex: 1 1 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    flex-flow: row wrap;
+    display: flex;
+  }
+
+  .coluna {
+    flex-direction: column;
+    box-sizing: border-box;
+    display: flex;
+    flex: 1 1 100%;
+    max-width: 33%;
+    padding: 0 10px 0 0;
+  }
+
+  .coluna100 {
+    flex-direction: column;
+    box-sizing: border-box;
+    display: flex;
+    flex: 1 1 100%;
+    max-width: 100%;
+    padding: 30px 10px 0 0;
+  }
+
+  .coluna-isPhonePortrait {
+    max-width: 100%;
   }

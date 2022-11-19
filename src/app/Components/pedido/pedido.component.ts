@@ -8,7 +8,6 @@ import { DataService } from 'src/app/Infrastructure/Service/data.service';
 import { MatFormField } from '@angular/material/form-field';
 import { ClientesDB } from 'src/app/Core/Entities/Clientes';
 import { PedidosDB } from 'src/app/Core/Entities/Pedidos';
-import { MediaObserver } from '@angular/flex-layout';
 import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { VERSION } from '@angular/material/core';
@@ -16,6 +15,8 @@ import { RepositionScrollStrategy } from '@angular/cdk/overlay';
 import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
 import { PedidoLista } from 'src/app/Core/Entities/PedidoLista';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { SpinnerOverlayService } from 'src/app/Infrastructure/Service/spinner.overlay.service';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-pedido',
@@ -24,24 +25,19 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 })
 export class PedidoComponent implements OnInit {
 
-  isHandset$: Observable<boolean> = this.media.asObservable().pipe(
-    map(() =>
-      this.media.isActive('xs') ||
-      this.media.isActive('sm') ||
-      this.media.isActive('lt-md')
-    ), tap(() => this.changeDetectorRef.detectChanges()))
-
   panelOpenState?: boolean = false;
 
   clientes: IAuxiliar[] = [];
   status: IAuxiliar[] = [];
   fretes: IAuxiliar[] = [];
-  public form!: FormGroup;
+  form!: FormGroup;
+  isPhonePortrait: boolean = false;
 
   constructor(protected dataService: DataService,
-              private media: MediaObserver,
               private changeDetectorRef: ChangeDetectorRef,
-              private formBuilder: FormBuilder,) { 
+              private formBuilder: FormBuilder,
+              private readonly spinner: SpinnerOverlayService,
+              private responsive: BreakpointObserver) { 
   }
 
   private carregarSeletores() {
@@ -73,6 +69,16 @@ export class PedidoComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   async ngOnInit(): Promise<void> {
+    
+    this.responsive.observe([
+      Breakpoints.HandsetPortrait,      
+      ])
+      .subscribe(result => {
+        this.isPhonePortrait = false; 
+        if (!result.matches) {
+          this.isPhonePortrait = true;
+        }
+    }); 
 
 		this.form = this.formBuilder.group({
 			Frete: [''],
@@ -80,7 +86,6 @@ export class PedidoComponent implements OnInit {
       Id_Status: ['']
 		});
 
-    this.panelOpenState = !(this.media.isActive('xs') || this.media.isActive('sm') || this.media.isActive('lt-md'))
     this.carregarSeletores();
     let pedidos = [...await this.dataService.obterPedidos()].map(pedido => new PedidoLista(pedido));
     this.dataSource = new MatTableDataSource(pedidos);
@@ -128,11 +133,11 @@ export class PedidoComponent implements OnInit {
   async openDialogImpressao(id: number, action: string = 'show'): Promise<void> {
     let pedido: any;
     if (typeof id !== 'undefined') {
-      //this.spinner.show();
+      this.spinner.show();
       pedido = new PedidoLista(await this.dataService.obterPedidoPorId(id)!);
       pedido.action = action;
-      //this.dialog.open(DiretivaDialogComponent, { data: publisher, width: '100%' });
-      //this.spinner.hide();
+      //this.dialog.open(ImpressaoDialogComponent, { data: publisher, width: '100%' });
+      this.spinner.hide();
     }
   }
 

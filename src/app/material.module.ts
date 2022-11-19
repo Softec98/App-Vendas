@@ -13,7 +13,6 @@ import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatNativeDateModule} from '@angular/material/core';
-import {FlexLayoutModule} from "@angular/flex-layout";
 
 import { MatExpansionModule } from '@angular/material/expansion';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
@@ -35,10 +34,9 @@ import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginato
     MatDatepickerModule,
     MatNativeDateModule,
     MatRadioModule,
-    FlexLayoutModule,
     MatExpansionModule,
     CdkAccordionModule,
-    MatBottomSheetModule,
+    MatBottomSheetModule
   ],
   exports: [
     MatSidenavModule,
@@ -57,7 +55,7 @@ import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginato
     MatExpansionModule,
     CdkAccordionModule,
     MatBottomSheetModule,
-    MatPaginatorModule,
+    MatPaginatorModule
   ]
 })
 

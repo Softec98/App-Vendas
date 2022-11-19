@@ -1,6 +1,5 @@
 import { DEFAULT_CURRENCY_CODE, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -21,6 +20,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TextMaskModule } from 'angular2-text-mask';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import ptBr from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
@@ -31,6 +31,7 @@ import { MaskCepDirective } from './Infrastructure/Directives/mask-cep.directive
 import { MaskDateDirective } from './Infrastructure/Directives/mask-date.directive';
 import { PedidoComponent } from './Components/pedido/pedido.component';
 import { MaterialModule } from './material.module';
+import { SpinnerOverlayComponent } from './Components/spinner-overlay/spinner-overlay.component';
 
 registerLocaleData(ptBr);
 
@@ -45,6 +46,7 @@ registerLocaleData(ptBr);
     MaskCepDirective,
     MaskDateDirective,
     PedidoComponent,
+    SpinnerOverlayComponent
   ],
   imports: [
     MaterialModule,
@@ -55,7 +57,6 @@ registerLocaleData(ptBr);
     MatSidenavModule,
     MatListModule,
     MatToolbarModule,
-    FlexLayoutModule,
     MatButtonModule,
     MatTableModule,
     MatMenuModule,
@@ -66,7 +67,8 @@ registerLocaleData(ptBr);
     MatSelectModule,
     FormsModule,
     ReactiveFormsModule,
-    TextMaskModule
+    TextMaskModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'pt' },
