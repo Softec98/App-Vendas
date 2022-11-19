@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, HostListener } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { DataService } from 'src/app/Infrastructure/Service/data.service';
@@ -19,6 +19,7 @@ import { NCMDB } from 'src/app/Core/Entities/NCM';
 import { EFrete } from 'src/app/Core/Enums/EFrete.enum';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 export class Group {
 	level = 0;
@@ -47,6 +48,11 @@ export class ListaPrecoComponent implements OnInit {
 	expandedProduto: any[] = [];
 	expandedSubProduto: ProdutoLista[] = [];
 	Estados: IAuxiliar[] = [];
+	edicao: boolean = false;
+	edicaoQtde: boolean = false;
+	edicaoVenda: boolean = false;
+	campo: string = '';
+	isPhonePortrait: boolean = false;
 
 	editRowId: number = -1
 
@@ -64,7 +70,8 @@ export class ListaPrecoComponent implements OnInit {
 		protected empresaService: EmpresaService,
 		protected cepService: CepService,
 		private formBuilder: FormBuilder,
-		private router: Router
+		private router: Router,
+		private responsive: BreakpointObserver
 	) {
 		this.columns = [
 			{
@@ -83,23 +90,24 @@ export class ListaPrecoComponent implements OnInit {
 				display: 'Preço',
 				field: 'vVenda'
 			}];
+
 		this.displayedColumns = this.columns.map(column => column.field);
 		this.groupByColumns = ['Familia'];
 		this.dataSource.sort = this.sort;
 	}
 
-	edit(row: number, element: string) {
-		this.editRowId = row;
-		setTimeout(() => {
-			const qtde = this.inputs!.find(x => x.nativeElement.getAttribute('name') == element)!
-			if (qtde != null) {
-				qtde.nativeElement.select();
-				qtde.nativeElement.focus();
-			}
-		})
-	}
-
 	async ngOnInit(): Promise<void> {
+
+		this.responsive.observe([
+			Breakpoints.HandsetPortrait,      
+			])
+			.subscribe(result => {
+			  this.isPhonePortrait = false; 
+			  if (!result.matches) {
+				this.isPhonePortrait = true;
+			  }
+		  }); 
+
 		this.dataService.ObterEstados().subscribe(data => {
 			this.Estados = data;
 		});
@@ -133,6 +141,20 @@ export class ListaPrecoComponent implements OnInit {
 
 		await this.ObterListaDePreco();
 	}
+
+	edit(row: number, element: string) {
+		this.edicao = !this.edicao;
+		if (this.edicao) {
+			this.editRowId = row;
+			setTimeout(() => {
+				const qtde = this.inputs!.find(x => x.nativeElement.getAttribute('name') == element)!
+				if (qtde != null) {
+					qtde.nativeElement.select();
+					qtde.nativeElement.focus();
+				}
+			});
+		}
+	}	
 
 	async applyFilter(event: Event) {
 		const filterValue = (event.target as HTMLInputElement).value;
@@ -478,4 +500,31 @@ export class ListaPrecoComponent implements OnInit {
 			(err: any) => console.log(err)
 		);
 	}
+
+	@HostListener('click', ['$event.target'])
+	onClick(e: HTMLElement) {
+	  if (e.getAttribute('role') === 'cell') {
+		if (e.parentElement?.getAttribute('role') === 'row') {
+			this.edicaoQtde = false;
+			this.edicaoVenda = false;
+			this.campo = Array.from(e.classList).find(x => x.indexOf('cdk-column-') > -1)?.replace('cdk-column-', '')!;
+			switch (this.campo) {
+				case "qProd":
+					this.edicaoQtde = true;
+					break;
+				case "vVenda":
+					this.edicaoVenda = true;
+				break;
+			}
+		}
+	  }
+	}
+
+	getColumns(): any[] {
+		this.columns = this.isPhonePortrait ? 
+			this.columns : 
+			this.columns.filter(x => x.field !== 'Unid')
+		this.displayedColumns = this.columns.map(column => column.field);
+		return this.columns;
+	  }
 }

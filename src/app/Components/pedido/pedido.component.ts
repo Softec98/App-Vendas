@@ -25,8 +25,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 })
 export class PedidoComponent implements OnInit {
 
-  panelOpenState?: boolean = false;
-
   clientes: IAuxiliar[] = [];
   status: IAuxiliar[] = [];
   fretes: IAuxiliar[] = [];

@@ -32,6 +32,7 @@ import { MaskDateDirective } from './Infrastructure/Directives/mask-date.directi
 import { PedidoComponent } from './Components/pedido/pedido.component';
 import { MaterialModule } from './material.module';
 import { SpinnerOverlayComponent } from './Components/spinner-overlay/spinner-overlay.component';
+import { ImpressaoDialogComponent } from './Components/impressao-dialog/impressao-dialog.component';
 
 registerLocaleData(ptBr);
 
@@ -46,7 +47,8 @@ registerLocaleData(ptBr);
     MaskCepDirective,
     MaskDateDirective,
     PedidoComponent,
-    SpinnerOverlayComponent
+    SpinnerOverlayComponent,
+    ImpressaoDialogComponent
   ],
   imports: [
     MaterialModule,

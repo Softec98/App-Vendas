@@ -1,42 +1,56 @@
-<div>
-	<br>
+<div class="container">
 	<div class="container">
 		<mat-card class="card">
-			<mat-card-title>
-				<div fxFlex="50%" fxFlex.xs="100%" fxLayout="column">
-					<mat-form-field>
-						<mat-label>Filtro</mat-label>
-						<input matInput (keyup)="applyFilter($event)" placeholder="Ex: Corante" #input>
-					</mat-form-field>
+			<mat-card-content>
+				<div class="linha">
+					<div class="coluna100">
+						<mat-form-field>
+							<mat-label>Filtro</mat-label>
+							<input matInput (keyup)="applyFilter($event)" placeholder="Ex: Corante" #input>
+						</mat-form-field>
+					</div>
 				</div>
 				<button type="button" mat-raised-button color="primary"
-					style="float:inline-end; top: 30px; height: 40px" [disabled]="!AlgumProdutoComQtde()"
+					style="float:inline-end; padding-top: 0px; height: 40px" [disabled]="!AlgumProdutoComQtde()"
 					(click)="scroll('fecharPedido')">Fechar Pedido</button>
-			</mat-card-title>
-			<mat-card-content>
 				<div class="mat-elevation-z8" style="margin-top: 10px;">
 					<mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort
 						(matSortChange)="onSortData($any($event))">
-						<ng-container *ngFor="let column of columns; let i = index" matColumnDef="{{ column.field }}">
-							<mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.display }}
-							</mat-header-cell>
+						<ng-container *ngFor="let column of getColumns(); let i = index" matColumnDef="{{ column.field }}">
+							<mat-header-cell *matHeaderCellDef mat-sort-header>{{ column.display }}</mat-header-cell>
 							<mat-cell *matCellDef="let row" (click)="edit(row['Id'], column.field)">
 								<span *ngIf="i < 3" (click)="editRowId=-1">{{ row[column.field] }}</span>
-								<span *ngIf="i == 4" (click)="editRowId=-1">{{ row[column.field] | currency }}</span>
-								<ng-container *ngIf="i == 3 && row['Id'] !== editRowId">
-									<span *ngIf="i == 3">{{ row[column.field] }}</span>
+								<ng-container *ngIf="i === 3 && (row['Id'] !== editRowId || !edicaoQtde)">
+									<span (click)="editRowId=-1">{{ row[column.field] }}</span>
 								</ng-container>
-								<ng-container *ngIf="i == 3 && row['Id'] === editRowId">
+								<ng-container *ngIf="i === 4 && (row['Id'] !== editRowId || !edicaoVenda)">
+									<span (click)="editRowId=-1">{{ row[column.field] | currency }}</span>
+								</ng-container>
+								<ng-container *ngIf="i === 3 && row['Id'] === editRowId && campo === 'qProd'">
 									<!-- <input matInput type="number" appearance="standard" name="qProd"
 										(ngModelChange)="row['qProd'] = $event === '' ? 0 : $event"
 										[ngModel]="row['qProd']"> -->
 									<!-- [(ngModel)]="row['qProd']" -->
-									<mat-form-field appearance="outline">
+									<mat-form-field appearance="outline"
+										style="margin-top:10px; margin-bottom: 0px; padding: 0px; padding:0">
 										<mat-label>Quantidade</mat-label>
 										<input matInput type="number" name="qProd"
 											(ngModelChange)="row['qProd'] = $event === '' ? 0 : $event"
 											[ngModel]="row['qProd']">
-										<mat-icon matSuffix>mode_edit</mat-icon>
+										<mat-icon matSuffix style="padding:0 5px;display: inline;"
+											(click)="editRowId=-1">save</mat-icon>
+									</mat-form-field>
+								</ng-container>
+								<ng-container *ngIf="i === 4 && row['Id'] === editRowId && campo === 'vVenda'">
+									<mat-form-field appearance="outline"
+										style="margin-top:10px; margin-bottom: 0px; padding: 0px; padding:0">
+										<mat-label>Valor unitário</mat-label>
+										<input matInput type="number" name="vVenda"
+											(ngModelChange)="row['vVenda'] = $event === '' ? 0 : $event"
+											[ngModel]="row['vVenda']">
+										<mat-icon matSuffix style="padding:0 5px;display: inline;"
+											(click)="editRowId=-1">save</mat-icon>
+										<!-- <mat-icon matSuffix style="padding:0;display:inline;">mode_edit</mat-icon> -->
 									</mat-form-field>
 								</ng-container>
 							</mat-cell>
@@ -60,13 +74,8 @@
 				</div>
 			</mat-card-content>
 		</mat-card>
-
-		<br>
-
 		<mat-card class="card" *ngIf="AlgumProdutoComQtde()" id="fecharPedido">
-
 			<h2>Preencha os dados do cliente</h2>
-
 			<form [formGroup]="form">
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
 					<div fxFlex="50%" fxFlex.xs="100%" fxLayout="column">
@@ -107,7 +116,7 @@
 							<input matInput placeholder="Inscrição Estadual" formControlName="IE">
 						</mat-form-field>
 					</div>
-				</div>				
+				</div>
 
 				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
 					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
@@ -252,9 +261,6 @@
 				</div>
 
 			</form>
-
 		</mat-card>
-
 	</div>
-	<br>
 </div>
