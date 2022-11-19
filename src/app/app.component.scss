@@ -17,13 +17,6 @@ mat-sidenav-container, mat-sidenav-content, mat-sidenav {
     color: lightgray;
   }
   
-  .navigation-items {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-  }
-  
   .icon {
     display: inline-block;
     height: 30px;
@@ -35,15 +28,19 @@ mat-sidenav-container, mat-sidenav-content, mat-sidenav {
   }
   
   .label {
-    display: inline-block;
     line-height: 30px;
-    margin: 0;
     width: 85%;
+    margin: 0;
+  }
+
+  .isPhonePortrait
+  {
+    margin-left: -50px;
   }
 
   .logo {
     position: absolute;
-    top: 5px;
+    top: 0px;
     width: 180px;
     height:115px;
     background: #673ab7;
@@ -56,3 +53,26 @@ mat-sidenav-container, mat-sidenav-content, mat-sidenav {
   left: 20px;
   top: -15px;
 }
+
+ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0 0 0 10px;
+  cursor: pointer;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+ }
+ 
+ li {
+  flex-grow: 1;
+ }
+
+ .menu {
+   flex: 1 1 0%;
+   box-sizing: border-box;
+   flex-direction: row;
+   display: flex;
+   place-content: stretch flex-end;
+   align-items: stretch;
+ }
