@@ -16,10 +16,10 @@ import { PedidosDB } from 'src/app/Core/Entities/Pedidos';
 import { PedidosItensDB } from 'src/app/Core/Entities/PedidosItens';
 import { ncmJson } from 'src/app/Infrastructure/ApplicationDB';
 import { NCMDB } from 'src/app/Core/Entities/NCM';
-import { EFrete } from 'src/app/Core/Enums/EFrete.enum';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { SpinnerOverlayService } from 'src/app/Infrastructure/Service/spinner.overlay.service';
 
 export class Group {
 	level = 0;
@@ -71,7 +71,8 @@ export class ListaPrecoComponent implements OnInit {
 		protected cepService: CepService,
 		private formBuilder: FormBuilder,
 		private router: Router,
-		private responsive: BreakpointObserver
+		private responsive: BreakpointObserver,
+		private readonly spinner: SpinnerOverlayService
 	) {
 		this.columns = [
 			{
@@ -398,7 +399,8 @@ export class ListaPrecoComponent implements OnInit {
 		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && 
 			(cnpj.length == 11 || cnpj.length == 14) && this.form.controls['cnpj'].valid) {
 			let cliente = new ClientesDB();
-			if (this.form.controls['id'].value != '0') {
+			if (this.form.controls['id'].value != '0') 
+			{
 				cliente.Id = this.form.controls['id'].value; }
 				cliente.CNPJ = cnpj;
 				cliente.IE = this.form.controls['IE'].value;
@@ -417,7 +419,7 @@ export class ListaPrecoComponent implements OnInit {
 				cliente.fone = this.form.controls['ddd'].value + ' ' + this.form.controls['fone'].value;
 				cliente.fone2 = this.form.controls['ddd2'].value + ' ' + this.form.controls['fone2'].value;
 				uf = cliente.UF;
-				idCliente = await this.dataService.SalvarCliente(cliente);
+				idCliente = await this.dataService.salvarCliente(cliente);
 				this.form.patchValue({
 					id: idCliente
 				});
@@ -452,7 +454,15 @@ export class ListaPrecoComponent implements OnInit {
 						pedido.Totalizar();
 					});
 				}
-				pedido.Salvar();
+				const idPedido = await pedido.Salvar();
+				if (idPedido > 0) {
+					let cliente = await this.dataService.obterClientePorId(idCliente);
+					if (cliente !== null) {
+						let alterado = new ClientesDB(cliente);
+						alterado.IdPedidoUltimo = idPedido; 
+						await this.dataService.salvarCliente(alterado);
+					}
+				}
 			}
 			alert("O pedido foi salvo com sucesso!");
 			this.router.navigate(['/pedidos']);
@@ -526,5 +536,5 @@ export class ListaPrecoComponent implements OnInit {
 			this.columns.filter(x => x.field !== 'Unid')
 		this.displayedColumns = this.columns.map(column => column.field);
 		return this.columns;
-	  }
+	}
 }

@@ -42,20 +42,20 @@ export class PedidosDB extends BaseEntity {
         Object.assign(this, init);
     }
 
-    async Salvar() {
-      await db.transaction('rw', db.Pedidos, db.PedidosItens, async () => {
-            return db.Pedidos.put(new PedidosDB(this))
+    async Salvar() : Promise<number> {
+        await db.transaction('rw', db.Pedidos, db.PedidosItens, async () => {
+            db.Pedidos.put(new PedidosDB(this))
             .then(Id => {
                 this.Id = Id; 
                 this.PedidosItens.map(item => {
                   item.Id_Pedido = Id;
                   db.PedidosItens.put(new PedidosItensDB(item));
               });
+              return Id;
             });
-
+        });
         // return db.Pedidos.put(new PedidosDB(this))
         //       .then(Id => this.Id = Id);
-
         // await db.transaction('rw', db.Pedidos, db.PedidosItens, async () => {
         //     return Promise.all(this.PedidosItens.map(item => db.PedidosItens.put(item)))
         //     .then(results => {
@@ -66,13 +66,14 @@ export class PedidosDB extends BaseEntity {
         //         db.Pedidos.put(new PedidosDB(this))
         //           .then(Id => this.Id = Id);
         //       });
-        });
+
+        return this.Id;
     }
 
     Totalizar() {
         if (typeof(this.PedidosItens) != 'undefined') {
-            this.vMerc = this.PedidosItens.reduce<number>((soma, obj) => 
-                { return soma + obj.qProd * obj.vProd; }, 0);
+            this.vMerc = this.PedidosItens.reduce<number>((soma, item) => 
+                { return soma + item.qProd * item.vProd; }, 0);
             this.valLiquido = this.vMerc + this.vICMS + this.vIPI;
             this.valTotal = this.valLiquido + this.valFrete + 
                 this.valTaxas - this.valDesconto;

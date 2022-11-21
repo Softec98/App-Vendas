@@ -1,10 +1,10 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
 import { db } from '../ApplicationDB';
-import { ClientesDB } from '../../Core/Entities/Clientes';
+import { Injectable } from '@angular/core';
 import { Utils } from 'src/app/Utils/Utils';
+import { HttpClient } from '@angular/common/http';
+import { ClientesDB } from '../../Core/Entities/Clientes';
+import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
 import { CondPagtoDB } from 'src/app/Core/Entities/CondPagto';
 
 @Injectable({
@@ -15,6 +15,7 @@ export class DataService {
   status: IAuxiliar[] = [];
   fretes: IAuxiliar[] = [];
   condpg: CondPagtoDB[] = [];
+  clientesIds: number[] = [];
 
   constructor(private http: HttpClient) { }
 
@@ -34,15 +35,31 @@ export class DataService {
     return this.http.get<any[]>('./assets/data/Estados.json');
   }
 
+  async obterClientes(filter: number[] = []) {
+    if (filter.length == 0)
+      return await db.Clientes.orderBy('xNome').toArray();
+    else
+      return await db.Clientes.orderBy('xNome')
+        .filter(x => filter.includes(x.Id)).toArray();
+  }
+
   async obterClientePeloCnpj(cnpj: string) {
     return await db.Clientes.filter(x => x.CNPJ == cnpj).first();
   }
 
-  async SalvarCliente(data: ClientesDB): Promise<number> {
+  async obterClientePorId(id: number) {
+    return await db.Clientes.get(id);
+  }
+
+  async salvarCliente(data: ClientesDB): Promise<number> {
     await db.transaction('rw', db.Clientes, function () {
       db.Clientes.put(data);
     }).catch(function (err) {
       console.error(err.stack || err);
+    });
+    db.clientes = [];
+    (await db.Clientes.toArray()).forEach(cliente => {
+      db.clientes.push({ key: cliente.Id, value: cliente.xNome })
     });
     return data.Id;
   }
@@ -74,16 +91,8 @@ export class DataService {
     }
   }
 
-  async obterClientes(filter: number[] = []) {
-    if (filter.length == 0)
-      return await db.Clientes.orderBy('xNome').toArray();
-    else
-      return await db.Clientes.orderBy('xNome')
-        .filter(x => filter.includes(x.Id)).toArray();
-  }
-
   async obterPedidos() {
-      return await db.Pedidos.toArray();
+      return await db.Pedidos.orderBy('Id').reverse().toArray();
   }
 
   async obterPedidoPorId(id: number) {
@@ -91,9 +100,10 @@ export class DataService {
   }
 
   async obterPedidosIdClientes() {
-    return await db.Pedidos.orderBy('Id_Cliente').uniqueKeys(function (keysArray) {
-      return keysArray;
-     });
+    this.clientesIds = [];
+    await db.Pedidos.orderBy('Id_Cliente').eachUniqueKey((x) => {
+      this.clientesIds.push(Number(x));
+    });
   }
 
   async apagarPedido(id: number) {

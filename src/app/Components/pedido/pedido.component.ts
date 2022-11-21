@@ -17,6 +17,7 @@ import { PedidoLista } from 'src/app/Core/Entities/PedidoLista';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { SpinnerOverlayService } from 'src/app/Infrastructure/Service/spinner.overlay.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { ImpressaoDialogComponent } from '../impressao-dialog/impressao-dialog.component';
 
 @Component({
   selector: 'app-pedido',
@@ -35,21 +36,25 @@ export class PedidoComponent implements OnInit {
               private changeDetectorRef: ChangeDetectorRef,
               private formBuilder: FormBuilder,
               private readonly spinner: SpinnerOverlayService,
-              private responsive: BreakpointObserver) { 
+              private responsive: BreakpointObserver,
+              private dialog: MatDialog) { 
   }
 
   private carregarSeletores() {
     const promise1 = this.dataService.obterFretes();
     const promise2 = this.dataService.obterStatus();
-    Promise.allSettled([promise1, promise2]).
+    const promise3 = this.dataService.obterPedidosIdClientes();
+    Promise.allSettled([promise1, promise2, promise3]).
       then((results) => results.forEach((result) => console.log(result.status))).
-      finally(() => this.atualizarSeletores());
+      finally(async () => this.atualizarSeletores());
   }
 
-  private atualizarSeletores() {
+  private async atualizarSeletores() {
     this.status = this.dataService.status;
     this.fretes = this.dataService.fretes;
-  }
+    this.clientes = [...await this.dataService.obterClientes(this.dataService.clientesIds)].map(cliente => 
+      <IAuxiliar> { key: cliente.Id, value: cliente.xNome });
+   }
 
   displayedColumns = [
     'id',
@@ -87,6 +92,9 @@ export class PedidoComponent implements OnInit {
     this.carregarSeletores();
     let pedidos = [...await this.dataService.obterPedidos()].map(pedido => new PedidoLista(pedido));
     this.dataSource = new MatTableDataSource(pedidos);
+    if (pedidos.length > 0 && typeof pedidos[0].NomeCliente == 'undefined') {
+      pedidos[0].NomeCliente = (await this.dataService.obterClientePorId(pedidos[0].Id_Cliente))?.xNome!
+    }
     setTimeout(() => {
       this.dataSource.paginator = this.paginator;
     }, 0);
@@ -134,7 +142,7 @@ export class PedidoComponent implements OnInit {
       this.spinner.show();
       pedido = new PedidoLista(await this.dataService.obterPedidoPorId(id)!);
       pedido.action = action;
-      //this.dialog.open(ImpressaoDialogComponent, { data: publisher, width: '100%' });
+      this.dialog.open(ImpressaoDialogComponent, { data: pedido, width: '800px' });
       this.spinner.hide();
     }
   }

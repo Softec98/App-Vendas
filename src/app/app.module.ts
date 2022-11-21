@@ -21,6 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TextMaskModule } from 'angular2-text-mask';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import ptBr from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
@@ -33,6 +34,7 @@ import { PedidoComponent } from './Components/pedido/pedido.component';
 import { MaterialModule } from './material.module';
 import { SpinnerOverlayComponent } from './Components/spinner-overlay/spinner-overlay.component';
 import { ImpressaoDialogComponent } from './Components/impressao-dialog/impressao-dialog.component';
+import { PedidoImpressaoComponent } from './Components/pedido-impressao/pedido-impressao.component';
 
 registerLocaleData(ptBr);
 
@@ -48,7 +50,8 @@ registerLocaleData(ptBr);
     MaskDateDirective,
     PedidoComponent,
     SpinnerOverlayComponent,
-    ImpressaoDialogComponent
+    ImpressaoDialogComponent,
+    PedidoImpressaoComponent
   ],
   imports: [
     MaterialModule,
@@ -70,7 +73,8 @@ registerLocaleData(ptBr);
     FormsModule,
     ReactiveFormsModule,
     TextMaskModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTabsModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'pt' },

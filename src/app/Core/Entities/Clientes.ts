@@ -26,6 +26,7 @@ export class ClientesDB extends BaseEntity {
     public SUFRAMA!: string;
     public indConsumidor!: boolean;
     public indInativo!: boolean;
+    public IdPedidoUltimo!: number;
 
     public constructor(init?: Partial<ClientesDB> ) {
         super(init as ClientesDB)

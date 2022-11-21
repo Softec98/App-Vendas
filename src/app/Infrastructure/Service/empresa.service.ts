@@ -3,13 +3,15 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, of } from 'rxjs';
 import { Buffer } from 'buffer/';
+import { SpinnerOverlayService } from './spinner.overlay.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmpresaService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private readonly spinner: SpinnerOverlayService) { }
 
   erroEmpresa: boolean = false;
 
@@ -37,7 +39,6 @@ export class EmpresaService {
       };
 
       let retorno = this.http.get<any>(url, httpOptions).pipe(catchError(this.handleError));
-
       if (!this.erroEmpresa)
         console.log("Empresa encontrada com sucesso!")
       else

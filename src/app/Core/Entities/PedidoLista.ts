@@ -1,5 +1,5 @@
 import { PedidosDB } from './Pedidos';
-import { clientes, fretes, status } from '../../Infrastructure/ApplicationDB';
+import { clientes, fretes, status, db } from '../../Infrastructure/ApplicationDB';
 
 export class PedidoLista extends PedidosDB {
 

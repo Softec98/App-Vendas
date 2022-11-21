@@ -3,7 +3,7 @@
 		<mat-card class="card">
 			<mat-card-content>
 				<div class="linha">
-					<div class="coluna100">
+					<div class="coluna coluna100" style="padding-top: 30px">
 						<mat-form-field>
 							<mat-label>Filtro</mat-label>
 							<input matInput (keyup)="applyFilter($event)" placeholder="Ex: Corante" #input>
@@ -74,11 +74,12 @@
 				</div>
 			</mat-card-content>
 		</mat-card>
-		<mat-card class="card" *ngIf="AlgumProdutoComQtde()" id="fecharPedido">
+		<mat-card class="card" *ngIf="AlgumProdutoComQtde()" id="fecharPedido" style="margin: 15px 0 15px 0; padding-left: 10px;">
 			<h2>Preencha os dados do cliente</h2>
 			<form [formGroup]="form">
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="50%" fxFlex.xs="100%" fxLayout="column">
+				<input matInput formControlName="Id" [hidden]="true">
+				<div class="linha">
+					<div class="coluna coluna25" [ngClass]="{'coluna50': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>CNPJ</mat-label>
 							<input matInput placeholder="Buscar cliente" [textMask]="documentoMask"
@@ -86,7 +87,6 @@
 							<button matSuffix mat-button>
 								<mat-icon (click)="BuscarEmpresaIcon(inputCliente.value)">search</mat-icon>
 							</button>
-							<input matInput formControlName="Id" [hidden]="true">
 							<mat-error *ngFor="let validation of validation_messages.cnpj">
 								<mat-error class="error-message"
 									*ngIf="form.controls['cnpj'].errors?.[validation.type] && (form.controls['cnpj'].dirty || form.controls['cnpj'].touched)">
@@ -95,22 +95,19 @@
 							</mat-error>
 						</mat-form-field>
 					</div>
-
-					<div>
+					<div class="coluna coluna10" [ngClass]="{'coluna25': !isPhonePortrait}">
 						<button type="button" mat-raised-button color="primary"
 							style="float:inline-end;margin-top: 10px" [disabled]="form.controls['nome'].value == ''"
 							(click)="form.reset();">Limpar</button>
 					</div>
-					<div>
+					<div class="coluna coluna10" [ngClass]="{'coluna25': !isPhonePortrait}">							
 						<button type="button" mat-raised-button color="primary"
 							style="float:inline-end;margin-top: 10px" [disabled]="form.controls['nome'].value == ''"
 							(click)="SalvarPedido()">Salvar</button>
 					</div>
-
 				</div>
-
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna-isPhonePortrait">
 						<mat-form-field appearance="outline">
 							<mat-label>Inscrição Estadual</mat-label>
 							<input matInput placeholder="Inscrição Estadual" formControlName="IE">
@@ -118,8 +115,8 @@
 					</div>
 				</div>
 
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna-isPhonePortrait">
 						<mat-form-field appearance="outline">
 							<mat-label>Nome</mat-label>
 							<input matInput placeholder="Nome do cliente" formControlName="nome" #inputNome>
@@ -132,8 +129,8 @@
 					</div>
 				</div>
 
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="100%" fxFlex.xs="100%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna-isPhonePortrait">
 						<mat-form-field appearance="outline">
 							<mat-label>Fantasia</mat-label>
 							<input matInput placeholder="Nome fantasia do cliente" formControlName="fantasia">
@@ -141,10 +138,9 @@
 					</div>
 				</div>
 
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="35%" fxFlex.xs="100%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna25" [ngClass]="{'coluna33': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
-							<span matPrefix> </span>
 							<mat-label>CEP</mat-label>
 							<input matInput placeholder="CEP" formControlName="cep" (keyup.enter)="ObterEndereco()"
 								appMaskCep appSelectOnFocus [textMask]="cepMask">
@@ -153,26 +149,27 @@
 							</button>
 						</mat-form-field>
 					</div>
-					<div fxFlex="20%" fxFlex.xs="100%" fxLayout="column">
-						<input type="checkbox" formControlName="me" id="me" class="form-check-input">
-						<label class="form-check-label" for="indMe">Micro empresa?</label>
+					<div class="coluna coluna25" [ngClass]="{'coluna66': !isPhonePortrait}">
+						<label class="form-check-label" for="indMe">Micro empresa?
+							<input type="checkbox" formControlName="me" id="me" class="form-check-input">
+						</label>
 					</div>
 				</div>
 
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="60%" fxFlex.xs="60%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna50" [ngClass]="{'coluna-isPhonePortrait': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>Endereço</mat-label>
 							<input matInput placeholder="Endereço do cliente" formControlName="endereco">
 						</mat-form-field>
 					</div>
-					<div fxFlex="12%" fxFlex.xs="20%" fxLayout="column">
+					<div class="coluna coluna10" [ngClass]="{'coluna33': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>Número</mat-label>
 							<input matInput placeholder="Número do endereço" formControlName="numero">
 						</mat-form-field>
 					</div>
-					<div fxFlex="18%" fxFlex.xs="20%" fxLayout="column">
+					<div class="coluna coluna40" [ngClass]="{'coluna66': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>Complemento</mat-label>
 							<input matInput placeholder="Complemento do endereço" formControlName="complemento">
@@ -180,20 +177,20 @@
 					</div>
 				</div>
 
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-					<div fxFlex="35%" fxFlex.xs="40%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna25" [ngClass]="{'coluna-isPhonePortrait': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>Bairro</mat-label>
 							<input matInput placeholder="Bairro do cliente" formControlName="bairro">
 						</mat-form-field>
 					</div>
-					<div fxFlex="35%" fxFlex.xs="40%" fxLayout="column">
+					<div class="coluna coluna50" [ngClass]="{'coluna-isPhonePortrait': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>Cidade</mat-label>
 							<input matInput placeholder="Cidade do cliente" formControlName="cidade">
 						</mat-form-field>
 					</div>
-					<div fxFlex="20%" fxFlex.xs="15%" fxLayout="column">
+					<div class="coluna coluna25" [ngClass]="{'coluna-isPhonePortrait': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>UF</mat-label>
 							<mat-select matInput placeholder="UF" formControlName="uf">
@@ -205,18 +202,14 @@
 						</mat-form-field>
 					</div>
 				</div>
-
-				<div fxLayout.xs="row wrap" fxLayoutGap="10px" fxLayoutGap.xs="2px">
-
-					<div fxFlex="7%" fxFlex.xs="100%" fxLayout="column">
+				<div class="linha">
+					<div class="coluna coluna10" [ngClass]="{'coluna33': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
-							<span matPrefix> </span>
 							<mat-label>DDD</mat-label>
 							<input matInput placeholder="DDD" formControlName="ddd" maxlength="2" appSelectOnFocus>
 						</mat-form-field>
 					</div>
-
-					<div fxFlex="39%" fxFlex.xs="100%" fxLayout="column">
+					<div class="coluna coluna40" [ngClass]="{'coluna66': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>1º Telefone</mat-label>
 							<span matPrefix></span>
@@ -225,16 +218,13 @@
 								appSelectOnFocus>
 						</mat-form-field>
 					</div>
-
-					<div fxFlex="7%" fxFlex.xs="100%" fxLayout="column">
+					<div class="coluna coluna10" [ngClass]="{'coluna33': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
-							<span matPrefix> </span>
 							<mat-label>DDD</mat-label>
 							<input matInput placeholder="DDD" formControlName="ddd2" maxlength="2" appSelectOnFocus>
 						</mat-form-field>
 					</div>
-
-					<div fxFlex="38%" fxFlex.xs="100%" fxLayout="column">
+					<div class="coluna coluna40" [ngClass]="{'coluna66': !isPhonePortrait}">
 						<mat-form-field appearance="outline">
 							<mat-label>2º Telefone</mat-label>
 							<span matPrefix></span>
@@ -244,22 +234,22 @@
 						</mat-form-field>
 					</div>
 				</div>
-
-				<div>
-					<mat-form-field appearance="outline">
-						<mat-label>E-mail</mat-label>
-						<mat-icon matPrefix>email</mat-icon>
-						<span matPrefix></span>
-						<input formControlName="email" matInput placeholder="E-mail" maxlength="100" type="email">
-						<mat-error *ngFor="let validation of validation_messages.email">
-							<mat-error class="error-message"
-								*ngIf="form.controls['email'].errors?.[validation.type] && (form.controls['email'].dirty || form.controls['email'].touched)">
-								{{validation.message}}
+				<div class="linha">
+					<div class="coluna coluna-isPhonePortrait">
+						<mat-form-field appearance="outline">
+							<mat-label>E-mail</mat-label>
+							<mat-icon matPrefix>email</mat-icon>
+							<span matPrefix></span>
+							<input formControlName="email" matInput placeholder="E-mail" maxlength="100" type="email">
+							<mat-error *ngFor="let validation of validation_messages.email">
+								<mat-error class="error-message"
+									*ngIf="form.controls['email'].errors?.[validation.type] && (form.controls['email'].dirty || form.controls['email'].touched)">
+									{{validation.message}}
+								</mat-error>
 							</mat-error>
-						</mat-error>
-					</mat-form-field>
+						</mat-form-field>
+					</div>
 				</div>
-
 			</form>
 		</mat-card>
 	</div>
