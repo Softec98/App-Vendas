@@ -35,6 +35,12 @@ import { MaterialModule } from './material.module';
 import { SpinnerOverlayComponent } from './Components/spinner-overlay/spinner-overlay.component';
 import { ImpressaoDialogComponent } from './Components/impressao-dialog/impressao-dialog.component';
 import { PedidoImpressaoComponent } from './Components/pedido-impressao/pedido-impressao.component';
+import { CepPipe } from './Infrastructure/Pipes/cep.pipe';
+import { FonePipe } from './Infrastructure/Pipes/fone.pipe';
+import { ClienteComponent } from './Components/cliente/cliente.component';
+import { ClientesComponent } from './Components/clientes/clientes.component';
+import { ZeroEsquerdaPipe } from './Infrastructure/Pipes/zero-esquerda.pipe';
+import { NovoClienteComponent } from './Components/novo-cliente/novo-cliente.component';
 
 registerLocaleData(ptBr);
 
@@ -51,7 +57,13 @@ registerLocaleData(ptBr);
     PedidoComponent,
     SpinnerOverlayComponent,
     ImpressaoDialogComponent,
-    PedidoImpressaoComponent
+    PedidoImpressaoComponent,
+    CepPipe,
+    FonePipe,
+    ClienteComponent,
+    ClientesComponent,
+    ZeroEsquerdaPipe,
+    NovoClienteComponent
   ],
   imports: [
     MaterialModule,

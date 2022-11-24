@@ -75,8 +75,7 @@ export class PedidosDB extends BaseEntity {
             this.vMerc = this.PedidosItens.reduce<number>((soma, item) => 
                 { return soma + item.qProd * item.vProd; }, 0);
             this.valLiquido = this.vMerc + this.vICMS + this.vIPI;
-            this.valTotal = this.valLiquido + this.valFrete + 
-                this.valTaxas - this.valDesconto;
+            this.valTotal = this.valLiquido + this.valFrete + this.valTaxas - this.valDesconto;
         }
     }
 }

@@ -6,10 +6,7 @@ import { ProdutosDB } from 'src/app/Core/Entities/Produtos';
 import { ProdutoLista } from 'src/app/Core/Entities/ProdutoLista'
 import { MatInput } from '@angular/material/input';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { EmpresaService } from 'src/app/Infrastructure/Service/empresa.service';
 import { Utils } from 'src/app/Utils/Utils';
-import { CepService } from 'src/app/Infrastructure/Service/cep.service';
-import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
 import cliente_validation from "../../../assets/data/Cliente-validation.json";
 import { ClientesDB } from 'src/app/Core/Entities/Clientes';
 import { PedidosDB } from 'src/app/Core/Entities/Pedidos';
@@ -17,9 +14,8 @@ import { PedidosItensDB } from 'src/app/Core/Entities/PedidosItens';
 import { ncmJson } from 'src/app/Infrastructure/ApplicationDB';
 import { NCMDB } from 'src/app/Core/Entities/NCM';
 import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { SpinnerOverlayService } from 'src/app/Infrastructure/Service/spinner.overlay.service';
 
 export class Group {
 	level = 0;
@@ -44,16 +40,16 @@ export class ListaPrecoComponent implements OnInit {
 	groupByColumns: string[] = [];
 	allData!: any[];
 	_allGroup!: any[];
-
 	expandedProduto: any[] = [];
 	expandedSubProduto: ProdutoLista[] = [];
-	Estados: IAuxiliar[] = [];
+	
 	edicao: boolean = false;
 	edicaoQtde: boolean = false;
 	edicaoVenda: boolean = false;
 	campo: string = '';
 	isPhonePortrait: boolean = false;
-
+	idPedido!: number;
+	idUltimoPedido!: number;
 	editRowId: number = -1
 
 	@ViewChildren(MatInput, { read: ElementRef }) inputs: QueryList<ElementRef> | undefined;
@@ -61,18 +57,12 @@ export class ListaPrecoComponent implements OnInit {
 
 	public form!: FormGroup;
 
-	cepMask = Utils.cepMask;
-	foneMask = Utils.foneMask();
-	documentoMask = Utils.documentoMask();
-
 	constructor(
 		protected dataService: DataService,
-		protected empresaService: EmpresaService,
-		protected cepService: CepService,
 		private formBuilder: FormBuilder,
 		private router: Router,
 		private responsive: BreakpointObserver,
-		private readonly spinner: SpinnerOverlayService
+		private activatedRoute: ActivatedRoute
 	) {
 		this.columns = [
 			{
@@ -98,19 +88,14 @@ export class ListaPrecoComponent implements OnInit {
 	}
 
 	async ngOnInit(): Promise<void> {
-
+		let pedido!: PedidosDB;
 		this.responsive.observe([
-			Breakpoints.HandsetPortrait,      
-			])
-			.subscribe(result => {
-			  this.isPhonePortrait = false; 
-			  if (!result.matches) {
+			Breakpoints.HandsetPortrait,
+		]).subscribe(result => {
+			this.isPhonePortrait = false;
+			if (!result.matches) {
 				this.isPhonePortrait = true;
-			  }
-		  }); 
-
-		this.dataService.ObterEstados().subscribe(data => {
-			this.Estados = data;
+			}
 		});
 
 		this.form = this.formBuilder.group({
@@ -134,13 +119,35 @@ export class ListaPrecoComponent implements OnInit {
 			me: [''],
 			ddd: [''],
 			ddd2: [''],
-			email: ['', Validators.email], 
+			email: ['', Validators.email],
 			fone: ['', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
 			fone2: ['', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
 			pais: ['']
 		});
 
 		await this.ObterListaDePreco();
+
+		this.idPedido = Number(this.activatedRoute.snapshot.params["id"]);
+		if (this.idPedido > 0) {
+			pedido = <PedidosDB>(await this.dataService.obterPedidoPorId(this.idPedido));
+			const cliente = await this.dataService.obterClientePorId(pedido?.Id_Cliente!)
+			if (cliente && cliente.CNPJ) {
+				this.form.patchValue({
+					cnpj: cliente.CNPJ
+				});
+			}
+			if (this.allData) {
+				if (pedido && pedido.PedidosItens) {
+					pedido.PedidosItens.forEach(item => {
+						let index = this.allData.findIndex(x => x["Id"] == item.Id_Produto)
+						if (index > -1) {
+							this.allData[index].qProd = item.qProd;
+							this.allData[index].vVenda = item.vProd;
+						}
+					});
+				}
+			}
+		}
 	}
 
 	edit(row: number, element: string) {
@@ -148,14 +155,14 @@ export class ListaPrecoComponent implements OnInit {
 		if (this.edicao) {
 			this.editRowId = row;
 			setTimeout(() => {
-				const qtde = this.inputs!.find(x => x.nativeElement.getAttribute('name') == element)!
-				if (qtde != null) {
-					qtde.nativeElement.select();
-					qtde.nativeElement.focus();
+				const campo_editavel = this.inputs!.find(x => x.nativeElement.getAttribute('name') == element)!
+				if (campo_editavel != null) {
+					campo_editavel.nativeElement.select();
+					campo_editavel.nativeElement.focus();
 				}
-			});
+			}, 0);
 		}
-	}	
+	}
 
 	async applyFilter(event: Event) {
 		const filterValue = (event.target as HTMLInputElement).value;
@@ -302,198 +309,6 @@ export class ListaPrecoComponent implements OnInit {
 		element?.focus();
 	}
 
-	BuscarEmpresa(event: Event): void {
-		const cnpj = (event.target as HTMLInputElement).value.match(/\d/g)?.join('');
-		this.BuscarEmpresaIcon(cnpj);
-	}
-
-	async BuscarEmpresaIcon(cnpj?: string): Promise<void> {
-		cnpj = cnpj?.match(/\d/g)?.join('');
-		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && 
-			cnpj.length == 14 && this.form.controls['cnpj'].valid) {
-			var cliente = await this.dataService.obterClientePeloCnpj(cnpj);
-			if (cliente != null) {
-				this.form.patchValue({
-					id: cliente.Id,
-					nome: cliente.xNome,
-					IE: cliente.IE,
-					fantasia: cliente.xFantasia,
-					cep: cliente.CEP,
-					endereco: cliente.xLgr,
-					numero: cliente.nro,
-					complemento: cliente.xComplemento,
-					bairro: cliente.cBairro,
-					cidade: cliente.xMun,
-					uf: cliente.UF,
-					me: cliente.indME,
-					pais: cliente.cPais,
-					email: cliente.email,
-					ddd: cliente.fone?.split(' ')[0] ?? '',
-					fone: cliente.fone?.split(' ')[1] ?? '',
-					ddd2: cliente.fone2?.split(' ')[0] ?? '',
-					fone2: cliente.fone2?.split(' ')[1] ?? '',
-				});
-			}
-			else {
-				this.empresaService.obterEmpresa(cnpj)
-					.subscribe({
-						next: (empresa: any) => {
-							if (this) {
-								this.form.patchValue({
-									id: 0,
-									nome: empresa.company.name,
-									fantasia: empresa.alias!,
-									cep: empresa.address.zip,
-									endereco: empresa.address.street,
-									numero: empresa.address.number,
-									complemento: empresa.address.details!,
-									bairro: empresa.address.district,
-									cidade: empresa.address.city,
-									uf: empresa.address.state,
-									me: empresa.company.size.text == "Microempresa",
-									pais: empresa.address.country.name,
-									email: empresa.emails.length > 0 ? empresa.emails[0].address : '',
-									ddd: empresa.phones.length > 0 ? empresa.phones[0].area : '',
-									fone: empresa.phones.length > 0 ? empresa.phones[0].number : '',
-									ddd2: empresa.phones.length > 1 ? empresa.phones[1].area : '',
-									fone2: empresa.phones.length > 1 ? empresa.phones[1].number : ''
-								});
-							}
-							//this.focarNoNumero();
-						},
-						error: (err: any) => {
-							alert(`Não foi possível encontrar a empresa,\nverifique se o CNPJ está correto.`);
-						}
-					});
-			}
-		}
-	}
-
-	ObterEndereco() {
-		let cep: string = this.form.controls['cep'].value.match(/\d/g)?.join('');
-		if (typeof cep !== 'undefined' && cep !== null && cep !== '' && this.form.controls['cep'].valid) {
-			this.cepService.ObterEndereco(cep)
-				.subscribe({
-					next: (endereco: any) => {
-						if (this)
-							this.form.patchValue({
-								endereco: endereco.logradouro,
-								complemento: endereco.complemento,
-								bairro: endereco.bairro,
-								uf: endereco.uf,
-								cidade: endereco.localidade
-							});
-					},
-					error: (err: any) => {
-						alert(`Erro ao buscar o CEP: ${err.message}`);
-					}
-				});
-		}
-	}
-
-	async SalvarPedido() {
-		const ncm: NCMDB[] = ncmJson;
-		let idCliente = 0;
-		let uf = ''
-		let cnpj: string = this.form.controls['cnpj'].value.match(/\d/g)?.join('');
-		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' && 
-			(cnpj.length == 11 || cnpj.length == 14) && this.form.controls['cnpj'].valid) {
-			let cliente = new ClientesDB();
-			if (this.form.controls['id'].value != '0') 
-			{
-				cliente.Id = this.form.controls['id'].value; }
-				cliente.CNPJ = cnpj;
-				cliente.IE = this.form.controls['IE'].value;
-				cliente.xNome = this.form.controls['nome'].value;
-				cliente.xFantasia = this.form.controls['fantasia'].value;
-				cliente.CEP = this.form.controls['cep'].value;
-				cliente.xLgr = this.form.controls['endereco'].value;
-				cliente.nro = this.form.controls['numero'].value;
-				cliente.xComplemento = this.form.controls['complemento'].value;
-				cliente.cBairro = this.form.controls['bairro'].value;
-				cliente.xMun = this.form.controls['cidade'].value;
-				cliente.UF = this.form.controls['uf'].value;
-				cliente.indME = this.form.controls['me'].value;
-				cliente.cPais = this.form.controls['pais'].value;
-				cliente.email = this.form.controls['email'].value;
-				cliente.fone = this.form.controls['ddd'].value + ' ' + this.form.controls['fone'].value;
-				cliente.fone2 = this.form.controls['ddd2'].value + ' ' + this.form.controls['fone2'].value;
-				uf = cliente.UF;
-				idCliente = await this.dataService.salvarCliente(cliente);
-				this.form.patchValue({
-					id: idCliente
-				});
-			}
- 
-			if (idCliente > 0) {
-				let condpg = await this.dataService.obterCondPagtoPorId(environment.Id_Cond_Pagto[0]);
-				let pedido = new PedidosDB();
-				pedido.Id_Cond_Pagto = environment.Id_Cond_Pagto[0];
-				pedido.Id_Cliente = idCliente;
-				pedido.Id_Status = 1;
-				pedido.Frete = condpg?.Frete!
-				pedido.Id_Pagto_Codigo = 1;
-				pedido.Parcelas = 1;
-				pedido.datCadastro = new Date();
-				pedido.datEmissao = new Date();
-				pedido.PedidosItens = [];
-				if (this.allData) {
-					const itensQtd = this.allData.filter(function (x) { return x.qProd > 0 });
-					itensQtd.map(item => {
-						let pedidoItem = new PedidosItensDB();
-						pedidoItem.Id_Produto = item.Id;
-						pedidoItem.NCM = ncm.find(x => item.Id_NCM == x.Id)?.NCM!;
-						pedidoItem.CFOP = uf == 'SP' ? 5101 : 6101;
-						pedidoItem.Unid = item.Unid;
-						pedidoItem.cProd = item.cProd;
-						pedidoItem.xProd = item.xProd;
-						pedidoItem.qProd = item.qProd;
-						pedidoItem.vProd = item.vVenda;
-						pedidoItem.vMerc = item.qProd * item.vVenda;
-						pedido.PedidosItens.push(pedidoItem);
-						pedido.Totalizar();
-					});
-				}
-				const idPedido = await pedido.Salvar();
-				if (idPedido > 0) {
-					let cliente = await this.dataService.obterClientePorId(idCliente);
-					if (cliente !== null) {
-						let alterado = new ClientesDB(cliente);
-						alterado.IdPedidoUltimo = idPedido; 
-						await this.dataService.salvarCliente(alterado);
-					}
-				}
-			}
-			alert("O pedido foi salvo com sucesso!");
-			this.router.navigate(['/pedidos']);
-	}
-
-	// private ObterValidacao() {
-	// 	const xCnpj = this.ObterDescricaoCampo('cnpj');
-	// 	const xNome = this.ObterDescricaoCampo('nome');
-	// 	return {
-	// 		'cnpj': [
-	// 			Utils.ObterMensagem('O', xCnpj, 'minlength', 11),
-	// 			Utils.ObterMensagem('O', xCnpj, 'maxlength', 14),
-	// 			Utils.ObterMensagem('O', xCnpj, 'pattern', 0, ' é inválido'),
-	// 			Utils.ObterMensagem('O', xCnpj, 'required')
-	// 		],
-	// 		'nome': [
-	// 			Utils.ObterMensagem('O', xNome, 'maxlength', 100),
-	// 			Utils.ObterMensagem('O', xNome, 'minlength', 5),
-	// 			Utils.ObterMensagem('O', xNome, 'pattern', 0, 'deve conter somente letras'),
-	// 			Utils.ObterMensagem('O', xNome, 'required')
-	// 		],
-	// 		'email': [
-	// 			Utils.ObterMensagem('O', this.ObterDescricaoCampo('email'), 'email', 0, ' é inválido')
-	// 		]
-	// 	};
-	// }
-
-	// private ObterDescricaoCampo(campo: string) {
-	// 	return this.camposData?.Fields.find(x => x.name == campo)?.description ?? '';
-	// }
-
 	private compare(a: any, b: any, isAsc: any) {
 		return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
 	}
@@ -513,28 +328,131 @@ export class ListaPrecoComponent implements OnInit {
 
 	@HostListener('click', ['$event.target'])
 	onClick(e: HTMLElement) {
-	  if (e.getAttribute('role') === 'cell') {
-		if (e.parentElement?.getAttribute('role') === 'row') {
-			this.edicaoQtde = false;
-			this.edicaoVenda = false;
-			this.campo = Array.from(e.classList).find(x => x.indexOf('cdk-column-') > -1)?.replace('cdk-column-', '')!;
-			switch (this.campo) {
-				case "qProd":
-					this.edicaoQtde = true;
-					break;
-				case "vVenda":
-					this.edicaoVenda = true;
-				break;
+		if (e.getAttribute('role') === 'cell') {
+			if (e.parentElement?.getAttribute('role') === 'row') {
+				this.edicaoQtde = false;
+				this.edicaoVenda = false;
+				this.campo = Array.from(e.classList).
+					find(x => x.indexOf('cdk-column-') > -1)?.replace('cdk-column-', '')!;
+				switch (this.campo) {
+					case "qProd":
+						this.edicaoQtde = true;
+						break;
+					case "vVenda":
+						this.edicaoVenda = true;
+						break;
+				}
 			}
 		}
-	  }
 	}
 
 	getColumns(): any[] {
-		this.columns = this.isPhonePortrait ? 
-			this.columns : 
+		this.columns = this.isPhonePortrait ?
+			this.columns :
 			this.columns.filter(x => x.field !== 'Unid')
 		this.displayedColumns = this.columns.map(column => column.field);
 		return this.columns;
+	}
+
+	async Salvar() { // Salvar Pedido
+		const ncm: NCMDB[] = ncmJson;
+		let idCliente = 0;
+		let uf = ''
+		let cnpj: string = this.form.controls['cnpj'].value.match(/\d/g)?.join('');
+		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' &&
+			(cnpj.length == 11 || cnpj.length == 14) && this.form.controls['cnpj'].valid) {
+			let cliente = new ClientesDB();
+			if (this.form.controls['id'].value != '0') {
+				cliente.Id = this.form.controls['id'].value;
+			}
+			cliente.CNPJ = cnpj;
+			cliente.IE = this.form.controls['IE'].value;
+			cliente.xNome = this.form.controls['nome'].value;
+			cliente.xFantasia = this.form.controls['fantasia'].value;
+			cliente.CEP = this.form.controls['cep'].value;
+			cliente.xLgr = this.form.controls['endereco'].value;
+			cliente.nro = this.form.controls['numero'].value;
+			cliente.xComplemento = this.form.controls['complemento'].value;
+			cliente.cBairro = this.form.controls['bairro'].value;
+			cliente.xMun = this.form.controls['cidade'].value;
+			cliente.UF = this.form.controls['uf'].value;
+			cliente.indME = this.form.controls['me'].value;
+			cliente.cPais = this.form.controls['pais'].value;
+			cliente.email = this.form.controls['email'].value;
+			cliente.fone = this.form.controls['ddd'].value + ' ' + this.form.controls['fone'].value;
+			cliente.fone2 = this.form.controls['ddd2'].value + ' ' + this.form.controls['fone2'].value;
+			uf = cliente.UF;
+			cliente.IdPedidoUltimo = this.idUltimoPedido;
+			idCliente = await this.dataService.salvarCliente(cliente);
+			this.form.patchValue({
+				id: idCliente
+			});
+		}
+
+		if (idCliente > 0) {
+			let condpg = await this.dataService.obterCondPagtoPorId(environment.Id_Cond_Pagto[0]);
+			let pedido = new PedidosDB();
+			if (this.idPedido && this.idPedido > 0) {
+				pedido = <PedidosDB>(await this.dataService.obterPedidoPorId(this.idPedido)!);
+			}
+			else {
+				pedido.Id_Cond_Pagto = environment.Id_Cond_Pagto[0];
+				pedido.Id_Cliente = idCliente;
+				pedido.Id_Status = 1;
+				pedido.Frete = condpg?.Frete!
+				pedido.Id_Pagto_Codigo = 1;
+				pedido.Parcelas = 1;
+				pedido.datCadastro = new Date();
+				pedido.datEmissao = new Date();
+				pedido.PedidosItens = [];
+			}
+			if (this.allData) {
+				const itensQtd = this.allData.filter(function (x) { return x.qProd > 0 });
+				itensQtd.map(item => {
+					if (this.idPedido && this.idPedido > 0 && pedido.PedidosItens) {
+						let pedidoItem = pedido.PedidosItens.find(x => x.Id_Produto == item.Id);
+						if (pedidoItem) {
+							pedidoItem.qProd = item.qProd;
+							pedidoItem.vProd = item.vVenda;
+							pedidoItem.vMerc = pedidoItem.qProd * pedidoItem.vProd;
+						}
+						else {
+							let novoItem = new PedidosItensDB(item);
+							// @ts-expect-error Aqui vai ocorrer um erro, mas estou ignorando
+							delete novoItem['Id'];
+							novoItem.Id_Produto = item.Id;
+							novoItem.vProd = item.vVenda;
+							novoItem.vMerc = novoItem.qProd * novoItem.vProd;
+							pedido.PedidosItens.push(novoItem);
+						}
+					}
+					else {
+						let pedidoItem = new PedidosItensDB();
+						pedidoItem.Id_Produto = item.Id;
+						pedidoItem.NCM = ncm.find(x => item.Id_NCM == x.Id)?.NCM!;
+						pedidoItem.CFOP = uf == 'SP' ? 5101 : 6101;
+						pedidoItem.Unid = item.Unid;
+						pedidoItem.cProd = item.cProd;
+						pedidoItem.xProd = item.xProd;
+						pedidoItem.qProd = item.qProd;
+						pedidoItem.vProd = item.vVenda;
+						pedidoItem.vMerc = item.qProd * item.vVenda;
+						pedido.PedidosItens.push(pedidoItem);
+					}
+					pedido.Totalizar();
+				});
+			}
+			const idPedido = await pedido.Salvar();
+			if (!this.idPedido) {
+				let cliente = await this.dataService.obterClientePorId(idCliente);
+				if (cliente !== null) {
+					let alterado = new ClientesDB(cliente);
+					alterado.IdPedidoUltimo = idPedido;
+					await this.dataService.salvarCliente(alterado);
+				}
+			}
+		}
+		alert("O pedido foi salvo com sucesso!");
+		this.router.navigate(['/pedidos']);
 	}
 }

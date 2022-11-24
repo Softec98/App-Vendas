@@ -1,7 +1,6 @@
 import { BaseEntity } from "./BaseEntity";
 
 export class ClientesDB extends BaseEntity {
-
     public Id!: number;
     public xNome!: string;
     public xContato!: string;
@@ -27,7 +26,6 @@ export class ClientesDB extends BaseEntity {
     public indConsumidor!: boolean;
     public indInativo!: boolean;
     public IdPedidoUltimo!: number;
-
     public constructor(init?: Partial<ClientesDB> ) {
         super(init as ClientesDB)
         Object.assign(this, init);

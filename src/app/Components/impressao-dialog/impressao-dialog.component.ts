@@ -35,7 +35,7 @@ export class ImpressaoDialogComponent {
         let pdfHeight = (canvas.height * pdfWidth) / canvas.width;
         pdf.addImage(contentDataURL, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         if (acao == 'download') {
-          pdf.save(`Pedido-${this.data.Id}.pdf`);
+          pdf.save(`Pedido-Fab-${this.data.Id}.pdf`);
         }
         else {
           window.open(URL.createObjectURL(pdf.output("blob")), '_blank');

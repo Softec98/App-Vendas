@@ -37,6 +37,7 @@ export class ApplicationDB extends Dexie {
   ProdutoPreco!: Table<ProdutoPrecoDB, number>;
   Produtos!: Table<ProdutosDB, number>;
 
+  clientes_Pedidos: IAuxiliar[] = [];
   clientes: IAuxiliar[] = [];
   fretes: IAuxiliar[] = [];
   status: IAuxiliar[] = [];
@@ -97,6 +98,14 @@ export class ApplicationDB extends Dexie {
         this.status.push({ key: stat.key, value: stat.value });
       });
     }
+
+    if (await db.Pedidos.count() > 0) {
+      let filter: number[] = [];
+      await db.Pedidos.orderBy('Id_Cliente').eachUniqueKey((x) => { filter.push(Number(x)); });      
+      this.clientes_Pedidos = [...await db.Clientes.orderBy('xNome').filter(x => 
+        filter.includes(x.Id)).toArray()].map(cliente => <IAuxiliar> 
+          { key: cliente.Id, value: cliente.xNome });
+    }
   }
 
   async populate() {
@@ -113,6 +122,10 @@ export class ApplicationDB extends Dexie {
       db.ProdutoPreco.bulkAdd(Utils.ObterLista<ProdutoPrecoDB>(prodPreco)),
       db.Produtos.bulkAdd(Utils.ObterLista<ProdutosDB>(produtos, ProdutosDB.name))
     ]);
+  }
+
+  preencherClientesPedidos(aux: IAuxiliar[]) {
+    this.clientes_Pedidos = aux;
   }
 }
 

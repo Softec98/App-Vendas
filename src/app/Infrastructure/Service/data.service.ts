@@ -15,6 +15,8 @@ export class DataService {
   status: IAuxiliar[] = [];
   fretes: IAuxiliar[] = [];
   condpg: CondPagtoDB[] = [];
+  pessoas: IAuxiliar[] = [];
+  estados: IAuxiliar[] = [];
   clientesIds: number[] = [];
 
   constructor(private http: HttpClient) { }
@@ -91,8 +93,24 @@ export class DataService {
     }
   }
 
+  async obterPessoas(): Promise<void> {
+    if (this.pessoas.length == 0) {
+      await Utils.getAuxiliar(`Pessoas`).then((aux) => {
+        this.pessoas = aux;
+      });
+    }
+  }
+
+  async obterUF(): Promise<void> {
+    if (this.estados.length == 0) {
+      await Utils.getAuxiliar(`Estados`).then((aux) => {
+        this.estados = aux;
+      });
+    }
+  }
+
   async obterPedidos() {
-      return await db.Pedidos.orderBy('Id').reverse().toArray();
+    return await db.Pedidos.orderBy('Id').reverse().toArray();
   }
 
   async obterPedidoPorId(id: number) {
@@ -109,6 +127,14 @@ export class DataService {
   async apagarPedido(id: number) {
     await db.transaction('rw', db.Pedidos, function () {
       db.Pedidos.delete(id);
+    }).catch(function (err) {
+      console.error(err.stack || err);
+    });
+  }
+
+  async apagarCliente(id: number) {
+    await db.transaction('rw', db.Clientes, function () {
+      db.Clientes.delete(id);
     }).catch(function (err) {
       console.error(err.stack || err);
     });
