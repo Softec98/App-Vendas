@@ -33,6 +33,12 @@
                             <td class="sFooter2" colspan="5" style="text-align: left;max-height: 18px; height: 18px; width: 447px; max-width: 447px;">{{ endereco }}</td>
                             <td class="sFooter2" colspan="3" style="text-align:right;max-height: 18px; height: 18px; width: 270px; max-width: 270px;">{{ cidade }} {{ cep | cep }}</td>
                         </tr>
+                        <tr style="height:19px;" *ngIf="!(data.obs == null || data.obs == '')">
+                            <td class="sFooter" colspan="8" style="text-align: left;max-height: 18px; height: 18px; width: 717px; max-width: 717px;"><b>Observação:</b></td>
+                        </tr>
+                        <tr style="height:19px;" *ngIf="!(data.obs == null || data.obs == '')">
+                            <td class="sFooter2" colspan="8" style="text-align:justify;max-height: 18px; height: 18px; width: 717px; max-width: 717px;">{{ obs }}</td>
+                        </tr>
                         <tr style="height:10px;">
                             <td colspan="8" style="border:0px;height:9px;width:717px;"></td>
                         </tr>

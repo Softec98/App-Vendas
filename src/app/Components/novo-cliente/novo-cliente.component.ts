@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { Utils } from 'src/app/Utils/Utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClientesDB } from 'src/app/Core/Entities/Clientes';
@@ -11,7 +11,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
   templateUrl: './novo-cliente.component.html',
   styleUrls: ['./novo-cliente.component.scss']
 })
-export class NovoClienteComponent implements OnInit {
+export class NovoClienteComponent implements OnInit, AfterViewChecked {
 
   isPhonePortrait: boolean = false;
   public form!: FormGroup;
@@ -21,10 +21,12 @@ export class NovoClienteComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private responsive: BreakpointObserver
+    private responsive: BreakpointObserver,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) { }
 
   async ngOnInit(): Promise<void> {
+    let cliente!: ClientesDB;
     this.responsive.observe([
       Breakpoints.HandsetPortrait,
     ]).subscribe(result => {
@@ -34,42 +36,44 @@ export class NovoClienteComponent implements OnInit {
       }
     });
 
+    const idCliente = Number(this.activatedRoute.snapshot.params["id"]);
+    if (idCliente) {
+      cliente = <ClientesDB>(await this.dataService.obterClientePorId(idCliente));
+    }
+
     this.form = this.formBuilder.group({
-      id: [0],
-      cnpj: this.formBuilder.control({ value: '', disabled: false }, Utils.isDocumento()),
-      IE: [''],
+      id: cliente.Id ?? [0],
+      cnpj: this.formBuilder.control({
+        value: cliente.CNPJ ?? '', disabled: false
+      }, Utils.isDocumento()),
+      IE: cliente?.IE ?? [''],
       nome: new FormControl('', Validators.compose([
         Validators.required,
         Validators.pattern(/^[a-zA-Z].*[\s\.]*$/),
         Validators.maxLength(100),
         Validators.minLength(5)
       ])),
-      fantasia: [''],
-      cep: [''],
-      endereco: [''],
-      complemento: [''],
-      numero: [''],
-      bairro: [''],
-      cidade: [''],
-      uf: [''],
-      me: [''],
-      ddd: [''],
-      ddd2: [''],
-      email: ['', Validators.email],
-      fone: ['', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
-      fone2: ['', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
-      pais: ['']
+      fantasia: cliente?.xFantasia! ?? [''],
+      cep: cliente?.CEP! ?? [''],
+      endereco: cliente?.xLgr! ?? [''],
+      complemento: cliente?.xComplemento! ?? [''],
+      numero: cliente?.nro! ?? [''],
+      bairro: cliente?.cBairro! ?? [''],
+      cidade: cliente?.xMun! ?? [''],
+      uf: cliente?.UF! ?? [''],
+      me: cliente?.indME! ?? [''],
+      ddd: cliente?.fone.split(' ')[0]! ?? [''],
+      ddd2: cliente?.fone2.split(' ')[0]! ?? [''],
+      email: cliente?.email! ?? ['', Validators.email],
+      fone: [cliente?.fone.split(' ')[1]! ?? '', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
+      fone2: [cliente?.fone2.split(' ')[1]! ?? '', Validators.pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4}|d{5})[-. ]?(\d{4})[-. ]?\s*$/)],
+      pais: [cliente?.cPais! ?? ''],
+      idPedidoUltimo: [cliente.IdPedidoUltimo ?? '']
     });
+  }
 
-    const idCliente = Number(this.activatedRoute.snapshot.params["id"]);
-    if (idCliente) {
-      const cliente = await this.dataService.obterClientePorId(idCliente);
-      if (cliente && cliente.CNPJ) {
-        this.form.patchValue({
-          cnpj: cliente.CNPJ
-        });
-      }
-    }
+  ngAfterViewChecked(): void {
+    this.changeDetectorRef.detectChanges();
   }
 
   async Salvar() { // Salvar Cliente
@@ -96,6 +100,7 @@ export class NovoClienteComponent implements OnInit {
       cliente.email = this.form.controls['email'].value;
       cliente.fone = this.form.controls['ddd'].value + ' ' + this.form.controls['fone'].value;
       cliente.fone2 = this.form.controls['ddd2'].value + ' ' + this.form.controls['fone2'].value;
+      cliente.IdPedidoUltimo = this.form.controls['idPedidoUltimo'].value;
       await this.dataService.salvarCliente(cliente);
     }
     alert("O cliente foi salvo com sucesso!");

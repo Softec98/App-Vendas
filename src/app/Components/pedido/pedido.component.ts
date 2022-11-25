@@ -1,18 +1,18 @@
-import { ChangeDetectorRef, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DataService } from 'src/app/Infrastructure/Service/data.service';
-import { MatFormField } from '@angular/material/form-field';
-import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
-import { PedidoDto } from 'src/app/Core/Entities/PedidoDto';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { SpinnerOverlayService } from 'src/app/Infrastructure/Service/spinner.overlay.service';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ImpressaoDialogComponent } from '../impressao-dialog/impressao-dialog.component';
 import { Router } from '@angular/router';
+import { MatSort } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
 import { db } from '../../Infrastructure/ApplicationDB';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { PedidoDto } from 'src/app/Core/Entities/PedidoDto';
+import { MatFormField } from '@angular/material/form-field';
+import { MatTableDataSource } from '@angular/material/table'
+import { IAuxiliar } from 'src/app/Core/Interface/IAuxiliar';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { DataService } from 'src/app/Infrastructure/Service/data.service';
+import { ImpressaoDialogComponent } from '../impressao-dialog/impressao-dialog.component';
+import { SpinnerOverlayService } from 'src/app/Infrastructure/Service/spinner.overlay.service';
+import { ChangeDetectorRef, Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 
 @Component({
   selector: 'app-pedido',

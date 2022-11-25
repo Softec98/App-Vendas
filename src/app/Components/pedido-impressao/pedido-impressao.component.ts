@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, Inject, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { db } from '../../Infrastructure/ApplicationDB';
 
@@ -14,6 +14,7 @@ export class PedidoImpressaoComponent {
   cidade!: string;
   cep!: string;
   telefone!: string;
+  obs!: string;
   constructor(public dialogRef: MatDialogRef<PedidoImpressaoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
     async ngOnInit(): Promise<void> {
@@ -25,6 +26,7 @@ export class PedidoImpressaoComponent {
         this.cidade = cliente.xMun + ' - ' + cliente.UF + ', ';
         this.cep = cliente.CEP;
         this.telefone = cliente.fone;
+        this.obs = this.data.obs.toString().split('\n').join("<br />");
       }
     }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { EmpresaService } from 'src/app/Infrastructure/Service/empresa.service';
 import cliente_validation from "../../../assets/data/Cliente-validation.json";
 import { DataService } from 'src/app/Infrastructure/Service/data.service';
@@ -13,7 +13,7 @@ import { Utils } from 'src/app/Utils/Utils';
 	templateUrl: './cliente.component.html',
 	styleUrls: ['./cliente.component.scss']
 })
-export class ClienteComponent implements AfterViewChecked {
+export class ClienteComponent implements OnInit, AfterViewChecked {
 
 	@ViewChild("inputCliente") inputClienteField!: ElementRef;
 	@Input() cnpj!: string;
@@ -77,10 +77,13 @@ export class ClienteComponent implements AfterViewChecked {
 	async BuscarEmpresaIcon(cnpj?: string): Promise<void> {
 		cnpj = cnpj?.match(/\d/g)?.join('');
 		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' &&
-			(cnpj.length == 11 || cnpj.length == 14) && this.formCliente.controls['cnpj'].valid) {
-			var cliente = await this.dataService.obterClientePeloCnpj(cnpj);
+			(cnpj.length == 11 || cnpj.length == 14) &&
+			this.formCliente.controls['cnpj'].valid && this.formCliente.controls['nome'].value == '') {
+			const cliente = await this.dataService.obterClientePeloCnpj(cnpj);
 			if (cliente != null) {
-				this.idUltimoPedido = cliente.IdPedidoUltimo;
+				if (cliente.IdPedidoUltimo) {
+					this.idUltimoPedido = cliente.IdPedidoUltimo;
+				}
 				this.formCliente.patchValue({
 					id: cliente.Id,
 					nome: cliente.xNome,

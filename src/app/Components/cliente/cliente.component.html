@@ -2,12 +2,13 @@
 <div class="form-wrapper">
     <ng-container [formGroup]="formCliente">
         <input matInput formControlName="id" [hidden]="true">
+        <input matInput formControlName="idPedidoUltimo" [hidden]="true">
         <div class="linha">
             <div class="coluna coluna25" [ngClass]="{'coluna50': !isPhonePortrait}">
                 <mat-form-field appearance="outline">
                     <mat-label>CPF ou CNPJ</mat-label>
                     <input matInput placeholder="Buscar cliente" [textMask]="documentoMask"
-                        (keyup)="BuscarEmpresa($event)" SelectOnFoscus #inputCliente formControlName="cnpj">
+                        (keyup)="BuscarEmpresa($event)" #inputCliente formControlName="cnpj" autofocus>
                     <button matSuffix mat-button>
                         <mat-icon (click)="BuscarEmpresaIcon(inputCliente.value)">search</mat-icon>
                     </button>

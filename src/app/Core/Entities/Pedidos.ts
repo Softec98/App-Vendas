@@ -1,7 +1,7 @@
-import { EFrete } from "../Enums/EFrete.enum";
 import { BaseEntity } from "./BaseEntity";
-import { PedidosItensDB } from '../Entities/PedidosItens';
+import { EFrete } from "../Enums/EFrete.enum";
 import { db } from '../../Infrastructure/ApplicationDB';
+import { PedidosItensDB } from '../Entities/PedidosItens';
 
 export class PedidosDB extends BaseEntity {
 
@@ -35,6 +35,7 @@ export class PedidosDB extends BaseEntity {
     public vTotalNF: number = 0;
     public TrackNumber!: string;
     public datEnvio!: Date;
+    public obs!: string;
     public PedidosItens!: PedidosItensDB[];
 
     public constructor(init?: Partial<PedidosDB> ) {

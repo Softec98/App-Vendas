@@ -87,6 +87,15 @@
 			</ng-container>
 
 			<div class="linha">
+				<div class="coluna coluna-isPhonePortrait">
+					<mat-form-field appearance="outline">
+						<mat-label>Observação</mat-label>
+						<textarea matInput appearance="outline" rows="3" placeholder="Observação"  [(ngModel)]="obs"></textarea>
+					</mat-form-field>
+				</div>
+			</div>
+
+			<div class="linha">
 				<div class="coluna coluna25" [ngClass]="{'coluna50': !isPhonePortrait}">
 					<button type="button" mat-raised-button color="primary" style="float:inline-end;margin-top: 10px"
 						[disabled]="form.controls['nome'].value == ''" (click)="Salvar()">Salvar Pedido</button>

@@ -1,21 +1,21 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, HostListener } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
-import { DataService } from 'src/app/Infrastructure/Service/data.service';
-import { ProdutosDB } from 'src/app/Core/Entities/Produtos';
-import { ProdutoLista } from 'src/app/Core/Entities/ProdutoLista'
-import { MatInput } from '@angular/material/input';
-import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Utils } from 'src/app/Utils/Utils';
-import cliente_validation from "../../../assets/data/Cliente-validation.json";
-import { ClientesDB } from 'src/app/Core/Entities/Clientes';
-import { PedidosDB } from 'src/app/Core/Entities/Pedidos';
-import { PedidosItensDB } from 'src/app/Core/Entities/PedidosItens';
-import { ncmJson } from 'src/app/Infrastructure/ApplicationDB';
+import { MatSort } from '@angular/material/sort';
 import { NCMDB } from 'src/app/Core/Entities/NCM';
-import { environment } from 'src/environments/environment';
+import { MatInput } from '@angular/material/input';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PedidosDB } from 'src/app/Core/Entities/Pedidos';
+import { environment } from 'src/environments/environment';
+import { ProdutosDB } from 'src/app/Core/Entities/Produtos';
+import { ClientesDB } from 'src/app/Core/Entities/Clientes';
+import { MatTableDataSource } from '@angular/material/table';
+import { ncmJson } from 'src/app/Infrastructure/ApplicationDB';
+import { ProdutoLista } from 'src/app/Core/Entities/ProdutoLista'
+import { PedidosItensDB } from 'src/app/Core/Entities/PedidosItens';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { DataService } from 'src/app/Infrastructure/Service/data.service';
+import cliente_validation from "../../../assets/data/Cliente-validation.json";
+import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren, HostListener } from '@angular/core';
 
 export class Group {
 	level = 0;
@@ -42,7 +42,7 @@ export class ListaPrecoComponent implements OnInit {
 	_allGroup!: any[];
 	expandedProduto: any[] = [];
 	expandedSubProduto: ProdutoLista[] = [];
-	
+
 	edicao: boolean = false;
 	edicaoQtde: boolean = false;
 	edicaoVenda: boolean = false;
@@ -51,6 +51,7 @@ export class ListaPrecoComponent implements OnInit {
 	idPedido!: number;
 	idUltimoPedido!: number;
 	editRowId: number = -1
+	obs!: string;
 
 	@ViewChildren(MatInput, { read: ElementRef }) inputs: QueryList<ElementRef> | undefined;
 	@ViewChild(MatSort) sort!: MatSort;
@@ -130,10 +131,13 @@ export class ListaPrecoComponent implements OnInit {
 		this.idPedido = Number(this.activatedRoute.snapshot.params["id"]);
 		if (this.idPedido > 0) {
 			pedido = <PedidosDB>(await this.dataService.obterPedidoPorId(this.idPedido));
+			if (pedido && pedido.obs) {
+				this.obs = pedido.obs;
+			}
 			const cliente = await this.dataService.obterClientePorId(pedido?.Id_Cliente!)
 			if (cliente && cliente.CNPJ) {
 				this.form.patchValue({
-					cnpj: cliente.CNPJ
+					cnpj: cliente.CNPJ,
 				});
 			}
 			if (this.allData) {
@@ -358,12 +362,17 @@ export class ListaPrecoComponent implements OnInit {
 		const ncm: NCMDB[] = ncmJson;
 		let idCliente = 0;
 		let uf = ''
+		let salvarUltPedido: boolean = true;
 		let cnpj: string = this.form.controls['cnpj'].value.match(/\d/g)?.join('');
 		if (typeof cnpj !== 'undefined' && cnpj !== null && cnpj !== '' &&
 			(cnpj.length == 11 || cnpj.length == 14) && this.form.controls['cnpj'].valid) {
 			let cliente = new ClientesDB();
 			if (this.form.controls['id'].value != '0') {
 				cliente.Id = this.form.controls['id'].value;
+				if (cliente.Id && cliente.Id > 0) {
+					cliente = <ClientesDB>(await this.dataService.obterClientePorId(cliente.Id));
+					salvarUltPedido = false;
+				}
 			}
 			cliente.CNPJ = cnpj;
 			cliente.IE = this.form.controls['IE'].value;
@@ -382,7 +391,6 @@ export class ListaPrecoComponent implements OnInit {
 			cliente.fone = this.form.controls['ddd'].value + ' ' + this.form.controls['fone'].value;
 			cliente.fone2 = this.form.controls['ddd2'].value + ' ' + this.form.controls['fone2'].value;
 			uf = cliente.UF;
-			cliente.IdPedidoUltimo = this.idUltimoPedido;
 			idCliente = await this.dataService.salvarCliente(cliente);
 			this.form.patchValue({
 				id: idCliente
@@ -396,6 +404,7 @@ export class ListaPrecoComponent implements OnInit {
 				pedido = <PedidosDB>(await this.dataService.obterPedidoPorId(this.idPedido)!);
 			}
 			else {
+				salvarUltPedido = true;
 				pedido.Id_Cond_Pagto = environment.Id_Cond_Pagto[0];
 				pedido.Id_Cliente = idCliente;
 				pedido.Id_Status = 1;
@@ -406,6 +415,8 @@ export class ListaPrecoComponent implements OnInit {
 				pedido.datEmissao = new Date();
 				pedido.PedidosItens = [];
 			}
+			pedido.Id_Cliente = idCliente;
+			pedido.obs = this.obs;
 			if (this.allData) {
 				const itensQtd = this.allData.filter(function (x) { return x.qProd > 0 });
 				itensQtd.map(item => {
@@ -443,7 +454,7 @@ export class ListaPrecoComponent implements OnInit {
 				});
 			}
 			const idPedido = await pedido.Salvar();
-			if (!this.idPedido) {
+			if (salvarUltPedido && !this.idPedido) {
 				let cliente = await this.dataService.obterClientePorId(idCliente);
 				if (cliente !== null) {
 					let alterado = new ClientesDB(cliente);
