@@ -94,7 +94,7 @@
                                         <mat-icon>delete</mat-icon>
                                     </button>
                                     <button (click)="openDialogImpressao(row.IdPedidoUltimo, 'print')" mat-icon-button
-                                        color="accent">
+                                        color="accent" [hidden]="!(row.IdPedidoUltimo > 0)">
                                         <mat-icon>print</mat-icon>
                                     </button>
                                 </td>
